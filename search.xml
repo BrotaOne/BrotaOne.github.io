@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>面试手写函数1</title>
+    <url>/2020/04/11/%E9%9D%A2%E8%AF%95%E6%89%8B%E5%86%99%E5%87%BD%E6%95%B01/</url>
+    <content><![CDATA[<p>记录一下最近一段时间，参与春招面试碰到的手写函数，巩固一下自己的基础。</p>
+<h3 id="数组去重"><a href="#数组去重" class="headerlink" title="数组去重"></a>数组去重</h3><p>数组去重本来是很容易的，特别是有了Set对象后(arr为要去重的数组)</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">[...new <span class="built_in">Set</span>(arr)]</span><br></pre></td></tr></table></figure>
+
+<p>但是如果加上附加条件、要求性能就挺麻烦了。</p>
+<p>es5大多数解法是通过一个Map记录数组的每一项，然后便利数组，没有重复的就记录下来，只需要一次遍历。</p>
+<p>如果要求在原数组中操作呢？那么删除元素就只有通过splice方法，但是如果对于数组中有1万个0或者[1,1,2,2,3,3,4,4…]，这种数组，一个个删除的效率太低，可以通过冒泡的方法把非重复项移到数组前面，然后截尾即可。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span>;    </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> j=<span class="number">0</span>; j &lt; arr.length; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!map.has(arr[j])) &#123;</span><br><span class="line">        i != j &amp;&amp; ([arr[i], arr[j]] = [arr[j], arr[i]]);</span><br><span class="line">        map.set(arr[i++], <span class="literal">true</span>);</span><br><span class="line">      &#125;    </span><br><span class="line">  &#125;</span><br><span class="line">  arr.splice(i, arr.length - i)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>那如果数组中的每一项都是对象呢？比如：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> singers = [</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'Leslie Cheung'</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'Leslie Cheung'</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'Eason Chan'</span> &#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>一样也是有骚操作的</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr, key</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> [...new <span class="built_in">Map</span>(arr.map(<span class="function"><span class="params">item</span>=&gt;</span>[item[key],item])).values()]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一样有不依靠骚操作版本</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr, key</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span>;    </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> j=<span class="number">0</span>; j &lt; arr.length; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!map.has(arr[j][key])) &#123;</span><br><span class="line">        i != j &amp;&amp; ([arr[i], arr[j]] = [arr[j], arr[i]]);</span><br><span class="line">        map.set(arr[i][key], i++);</span><br><span class="line">      &#125;    </span><br><span class="line">  &#125;</span><br><span class="line">  arr.splice(i, arr.length - i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <tags>
+        <tag>学习</tag>
+        <tag>前端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>js深拷贝</title>
+    <url>/2020/04/10/js%E6%B7%B1%E6%8B%B7%E8%B4%9D/</url>
+    <content><![CDATA[<h1 id="深拷贝还是浅拷贝"><a href="#深拷贝还是浅拷贝" class="headerlink" title="深拷贝还是浅拷贝"></a>深拷贝还是浅拷贝</h1><p>深拷贝和浅拷贝的问题，我在第一次参加秋招面试的时候就碰上了，我当时的回答现在已经记不得了，面试之后我看了几个版本的深、浅拷贝代码，但是总是没有完美得方案。</p>
+<p>（浅拷贝非常简单）</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">shallowClone</span>(<span class="params">o</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(<span class="keyword">typeof</span> o != <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> o != <span class="string">'function'</span>)</span><br><span class="line">		<span class="keyword">return</span> o;</span><br><span class="line">	<span class="keyword">let</span> obj;</span><br><span class="line">	<span class="keyword">if</span>(o <span class="keyword">instanceof</span> <span class="built_in">Array</span>)</span><br><span class="line">		obj = [];</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		obj = &#123;&#125;;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> i <span class="keyword">in</span> o)</span><br><span class="line">		obj[i] = o[i];</span><br><span class="line">	<span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>一般来说 JS 深克隆要考虑下面几个问题：</p>
+<p>JSON 克隆不支持函数、引用、undefined、Date、RegExp 等<br>递归克隆要考虑环、爆栈<br>要考虑 Date、RegExp、Function 等特殊对象的克隆方式<br>要不要克隆 <strong>proto</strong>，如果要克隆，就非常浪费内存；如果不克隆，就不是深克隆。</p>
+</blockquote>
+]]></content>
+      <tags>
+        <tag>学习</tag>
+        <tag>前端</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端学习的摸索</title>
     <url>/2020/03/17/%E5%89%8D%E7%AB%AF%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%91%B8%E7%B4%A2/</url>
     <content><![CDATA[<p>​        从一年前开始学习前端，现在才不多已经要一年了。转眼间现在就已经是研三了，经历过2019年的秋招，现在春招都开始了这么长时间，我却依旧没有offer，真的让人难受啊，想着现在还有毕业论文的事请没有做，感觉时间很紧迫，有点慌，又怕找不到工作，又怕耽误毕业，哎！希望昨天面试的能够拿到offer吧！</p>
@@ -37,7 +81,7 @@
 <p>与上次不同，这次虽然依旧受苦，但是我已经能打过很多boss了，甚至打到了dlc，除了科斯孤儿和劳伦斯打不过外，还有本体的boss不想先打，其他boss都打过了，尤其是没用枪反打过了女boss（再一次忘记了名字）。</p>
 <h2 id="只狼"><a href="#只狼" class="headerlink" title="只狼"></a>只狼</h2><p>和之前的魂系列游戏不同，只狼取消了经历条，取而代之是招架条，虽然可以让玩家更莽了，我却是更加受苦了，再多次挑战二次猿失败后开启了开怪逃课之路。</p>
 <h2 id="魂2，魂1"><a href="#魂2，魂1" class="headerlink" title="魂2，魂1"></a>魂2，魂1</h2><p>血源打过之后，信心爆棚，又买了黑魂2，虽然看到网上说魂2更加受苦，堆怪、加上地图更加恶意。然而我还是小瞧了魂2，想着有经验了，应该不怕，听说法师很牛逼之后，甚至第一个上手吧法师职业，结果发现法师法术次数不够用、施术太慢，依旧受苦，后面也就弃了。</p>
-<p>后来发现ns上有黑暗之魂1 重制版，可以掌上受苦，而且魂1的法师更强，于是按捺不住自己，又买了魂1。好在魂1我是通关了好几回，加上有弹反捏魂，打不过就刷魂呗，反正是arpg游戏，现在有个存档都玩到了3周目了。</p>
+<p>后来发现ns上有黑暗之魂1 重制版，可以掌上受苦，而且听说魂1的法师很强，于是按捺不住自己想玩无双黑魂的心，又买了魂1。好在魂1我是通关了好几回，加上有弹反捏魂，打不过就刷魂呗，反正是arpg游戏，现在有个存档都玩到了3周目了。</p>
 <h2 id="之后的期待"><a href="#之后的期待" class="headerlink" title="之后的期待"></a>之后的期待</h2><p>19年6月的游戏展上，Form Software公司宣布了新游戏Eleden Ring，期待早日开售。<br>没想到19年12月的新冠肺炎影响到了2020年的游戏展、奥运会、NBA，全球几十亿人，哎，好在游戏还是可以在网上看发布会。</p>
 ]]></content>
       <tags>
