@@ -1,6 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>electron写一个记事本app</title>
+    <url>/2020/04/12/electron%E5%86%99%E4%B8%80%E4%B8%AA%E8%AE%B0%E4%BA%8B%E6%9C%ACapp/</url>
+    <content><![CDATA[<p>写在前面：</p>
+<p>我是在学习Electron的时候，看到了<a href="https://www.jianshu.com/p/57d910008612" target="_blank" rel="noopener">Electron: 从零开始写一个记事本app</a>，然后就想模仿这篇文章，熟悉一下Electron，在实现的过程中，感觉这个记事本app可以写得更好，于是做了改进。对原文感兴趣的，可以直接点进去看。</p>
+<blockquote>
+<p>Electron是GitHub开发的一个开源框架。它允许使用Node.js（作为后端）和Chromium（作为前端）完成桌面GUI应用程序的开发。Electron现已被多个开源Web应用程序用于前端与后端的开发，著名项目包括GitHub的Atom和微软的Visual Studio Code。</p>
+</blockquote>
+<p>因为使用了Chromium作为前端，因此制作后的软件即使很简单，也会特别小，但也因为Chromium跨平台，因此Electron也可以跨平台开发。</p>
+<h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h3><p>和原文的记事本app相同</p>
+<p><strong>主菜单：</strong>包括<code>File</code>, <code>Edit</code>, <code>View</code>, <code>Help</code>四个主菜单。重点是<code>File</code>菜单下的三个子菜单：<code>New</code>（新建文件）、<code>Open</code>（打开文件）、<code>Save</code>（保存文件），这三个菜单需要自定义点击事件，其它的菜单基本使用内建的方法处理，所以没什么难度。</p>
+<p><strong>文本框：</strong>用于文本编辑。这也是这个App上的唯一一个组件，它的宽和高自动平铺满整个窗口大小。当修改了文本框中的文字后，会在App标题栏上最右侧添加一个<code>*</code>号以表示文档尚未保存。</p>
+<p><strong>加载和保存文本：</strong>可以打开本地文本文件，支持<code>.txt</code>, <code>.js</code>, <code>.html</code>, <code>.md</code>等文本文件；可以将文本内容保存为本地文本文件。在<strong>打开</strong>或<strong>新建</strong>文件前，如果当前文档尚未保存，会提示用户先保存文档。</p>
+<p><strong>退出程序：</strong>退出窗口或程序时，会检测当前文档是否需要保存，如果尚未保存，提示用户保存。</p>
+<p><strong>右键菜单：</strong>支持右键菜单，可以通过菜单右键执行一些基本的操作，如：复制、粘贴等。<br> 下面是这个记事本App的演示效果，源码下载点击 <a href="https://github.com/XMandarava/Demo-Electron-Notepad" target="_blank" rel="noopener">这里</a>。</p>
+<h3 id="安装electron-forge"><a href="#安装electron-forge" class="headerlink" title="安装electron-forge"></a>安装electron-forge</h3><p>electron-forge是一个类似于傻瓜开发包的Electron工具整合项目</p>
+<p>不得不说，我遇到的第一个难题就是安装electron-forge</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm --registry&#x3D;https:&#x2F;&#x2F;registry.npm.taobao.org</span><br><span class="line">cnpm install -g electron</span><br><span class="line">cnpm install -g electron-forge</span><br></pre></td></tr></table></figure>
+
+<p>但我在第三步的时候，一直安装模块失败，可是package.json中一直都没有出现安装失败的模块，导致我也无法使用cnpm install手动安装，最后还是靠了科学上网发现，缺少了electron这个模块，我本来以为全局安装之后就不需要了</p>
+<h3 id="对electron的必需了解"><a href="#对electron的必需了解" class="headerlink" title="对electron的必需了解"></a>对electron的必需了解</h3><p><img src="D:%5CDocuments%5Cgit%5Cbrotaone.github.io%5Cblog%5Csource_posts%5Cnotepad1.png" alt="1586676315786"></p>
+<p>上图是我实际代码的结构图，其中index.js、index.html、index.css是自动生成的，是eleectron应用打开直接能看到的部分</p>
+<p>index.html就是打开的第一个窗口，index.js是主进程执行的js文件，只有在index.js中或index.js引用的模块才是在主进程中运行，其他js文件都会是在渲染进程中运行，并且只有渲染进程才能访问document，直接改变视图</p>
+<p>当打开新的窗口时，就可以创建新的渲染进程。如果主进程需要与渲染进程通信，可以使用mainWindow.webContents.send发送信息，ipcRenderer.on接受信息</p>
+<p>对于主菜单和右键菜单， 每一项可选的属性有role、label、type、click、accelerate（快捷键），electron提供的role包括：</p>
+<ul>
+<li>undo： 撤销</li>
+<li>redo：重做</li>
+<li>cut：剪切</li>
+<li>copy：复制</li>
+<li>paste：粘贴</li>
+<li>pasteAndMatchStyle</li>
+<li>selectAll：全选</li>
+<li>delete：删除</li>
+<li>minimize：当前窗口最小化</li>
+<li>close：关闭当前窗口</li>
+<li>quit：退出应用程序</li>
+<li>reload：刷新当前窗口</li>
+<li>forceReload：强制刷新当前窗口，忽略缓存</li>
+<li>toggleDevTools：打开或者关闭 devtool</li>
+<li>togglefullscreen：进行全屏切换</li>
+<li>resetZoom：重置窗口大小</li>
+<li>zoomIn：放大窗口的10%.</li>
+<li>zoomOut：缩小窗口的10%.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;设置分隔符</span><br><span class="line">type: &#39;separator&#39;</span><br><span class="line">&#x2F;&#x2F;设置快捷键</span><br><span class="line">accelerator: &#39;CmdOrCtrl+Z&#39;,</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现记事本"><a href="#实现记事本" class="headerlink" title="实现记事本"></a>实现记事本</h3><p>记事本的主体页面，可以将一个textarea全屏显示，去掉outline实现</p>
+<p>然后是主菜单，File菜单下需要实现New、Open、Save功能，因此需要能访问textarea，必须得在渲染进程中运行，但是为了能在第一个界面中就渲染出主菜单，又必须在主进程中载入主菜单，因此必须使用主进程向渲染进程通信，将操作交给渲染进程得回调函数执行</p>
+<p>考虑到软件的模块化，我将主菜单全部的代码放在了appMenuTemplate（原文File仍在index.js中）</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> appMenuTemplate = [&#123;</span><br><span class="line">  label: <span class="string">'File'</span>,</span><br><span class="line">  submenu: [&#123;</span><br><span class="line">    label: <span class="string">'New'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'new'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Open'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'open'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Save'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'save'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    type: <span class="string">'separator'</span></span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    role: <span class="string">'quit'</span></span><br><span class="line">  &#125;]</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>然后在index.js中引入模块，为了在模块中访问mainWindow，我将该变量声明在了global全局里</p>
+<p>并且在渲染模块中，newText、 openText等函数也单独写在了utility.js中，减少耦合</p>
+<h3 id="回调的小问题"><a href="#回调的小问题" class="headerlink" title="回调的小问题"></a>回调的小问题</h3><p>可能是由于electron的api更新，对话框函数返回的不再是一个普通对象，而是一个Promise函数。为了得到数据，就要在then方法中插入回调，比如在打开文件函数中</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">openText</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">await</span> askSaveIfNeed();</span><br><span class="line">  <span class="comment">//files是promise对象</span></span><br><span class="line">  <span class="keyword">const</span> files = remote.dialog.showOpenDialog(remote.getCurrentWindow(), &#123;</span><br><span class="line">    filters: [</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">"Text Files"</span>, <span class="attr">extensions</span>: [<span class="string">'txt'</span>, <span class="string">'js'</span>, <span class="string">'html'</span>, <span class="string">'md'</span>] &#125;,</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">'All Files'</span>, <span class="attr">extensions</span>: [<span class="string">'*'</span>] &#125;</span><br><span class="line">    ],</span><br><span class="line">    properties: [<span class="string">'openFile'</span>]</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  files.then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">    currentFile = data.filePaths[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">const</span> txtRead = readText(currentFile);</span><br><span class="line">    txtEditor.value = txtRead;</span><br><span class="line">    <span class="built_in">document</span>.title = <span class="string">"Notepad - "</span> + currentFile;</span><br><span class="line">    isSaved = <span class="literal">true</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了能得到文件的路径和文件名，必须在回调函数中设置</p>
+<h3 id="调用的先后问题"><a href="#调用的先后问题" class="headerlink" title="调用的先后问题"></a>调用的先后问题</h3><p>在原文的基础上，改写之后，似乎就差不多，但是进一步测试发现，如果文件未保存的情况下，点击退出即使选择了保存，也会直接退出程序</p>
+<p>这样的情况是由于，electron很多操作都是依赖异步Promise，点击退出后，由于异步操作，导致退出程序先保存对话框运行，任务直接结束运行了，可解决的办法之一是，将删除操作放在回调函数中执行</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'exiting'</span>:</span><br><span class="line">	<span class="comment">//返回的是Promise对象</span></span><br><span class="line">      <span class="keyword">const</span> result = askSaveIfNeed();</span><br><span class="line">      result.then(<span class="function"><span class="params">()</span> =&gt;</span> ipcRenderer.sendSync(<span class="string">'reqaction'</span>, <span class="string">'exit'</span>));</span><br><span class="line">      <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+
+]]></content>
+  </entry>
+  <entry>
     <title>js中容易遗忘的知识点（长更）</title>
     <url>/2020/04/12/js%E4%B8%AD%E5%AE%B9%E6%98%93%E9%81%97%E5%BF%98%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9%EF%BC%88%E9%95%BF%E6%9B%B4%EF%BC%89/</url>
     <content><![CDATA[<p>记录一下我在js学习中，屡看屡忘的知识点，准备长期更新</p>
@@ -112,6 +176,7 @@
 <li>不能正确处理new Date()</li>
 <li>不能处理正则</li>
 <li>不能处理new Error()</li>
+<li>会抛弃对象的constructor,所有的构造函数会指向Object【参考4】</li>
 </ol>
 <h5 id="较为完善解法"><a href="#较为完善解法" class="headerlink" title="较为完善解法"></a>较为完善解法</h5><p>先上代码（代码主要来自参考【1】，懒，只添加了函数判断、cache.filter换成的find方法）</p>
 <figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepCopy</span>(<span class="params">obj, cache = []</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (obj === <span class="literal">null</span> || (<span class="keyword">typeof</span> obj !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> obj !== <span class="string">'function'</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Date]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object RegExp]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">RegExp</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Error]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Error</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> obj === <span class="string">'function'</span>) <span class="keyword">return</span> obj.bind(&#123;&#125;);</span><br><span class="line">  <span class="keyword">const</span> item = cache.find(<span class="function"><span class="params">item</span> =&gt;</span> item.original === obj)</span><br><span class="line">  <span class="keyword">if</span> (item) <span class="keyword">return</span> item.copy</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> copy = <span class="built_in">Array</span>.isArray(obj) ? [] : &#123;&#125;</span><br><span class="line">  cache.push(&#123;</span><br><span class="line">    original: obj,</span><br><span class="line">    copy</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Object</span>.keys(obj).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    copy[key] = deepCopy(obj[key], cache)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> copy</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -127,10 +192,13 @@
 <li>Function拷贝不完美</li>
 </ol>
 <p>如果有更好的办法，还会继续更新</p>
+<p>挖个坑，有时间学习</p>
+<p><a href="https://juejin.im/post/5df7175fe51d45582512962c" target="_blank" rel="noopener">头条面试官：你知道如何实现高性能版本的深拷贝嘛？</a></p>
 <p>参考：</p>
 <p>【1】<a href="https://juejin.im/post/5e906ab8518825738e217414" target="_blank" rel="noopener">JavaScript系列： 一、手撕JS中的深浅拷贝</a></p>
 <p>【2】<a href="https://www.zhihu.com/question/64703741/answer/223375284" target="_blank" rel="noopener">JavaScript深克隆-方应杭-知乎回答</a></p>
 <p>【3】<a href="https://stackoverflow.com/questions/1833588/javascript-clone-a-function" target="_blank" rel="noopener">bind方法拷贝函数</a></p>
+<p>【4】<a href="https://juejin.im/post/5abb55ee6fb9a028e33b7e0a" target="_blank" rel="noopener">面试官:请你实现一个深克隆</a></p>
 ]]></content>
       <tags>
         <tag>学习</tag>

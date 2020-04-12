@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>
+    Brota  - electron写一个记事本app 
+  </title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+   
+<link rel="stylesheet" href="/css/style.css">
+
+  <link
+    href="https://google-fonts.mirrors.sjtug.sjtu.edu.cn/css?family=Noto+Sans+SC&display=swap"
+    rel="stylesheet"
+  />
+
+    
+<link rel="stylesheet" href="/css/iDisqus.min.css">
+ 
+<script src="/js/iDisqus.min.js"></script>
+
+
+  <script>
+    var disq = new iDisqus("comment", {
+      forum: "pcrab-blog",
+      api: "https://disqus.pcrab.ml",
+      site: "https://pcrab.ml",
+      mode: 1,
+      timeout: 3000,
+      init: true
+    })
+  </script>
+   
+
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div class="title">
+  <img class="title_img" src="https://brotaone.github.io/images/icon.png" /><br />
+  <p id="site_title">&nbspBrota&nbsp</p>
+</div>
+
+  <div class="navi">
+    <a id="navi_item" href="/#" class="menu-item-link">Home</a>
+    <a id="navi_item" href="/tags" class="menu-item-link">tags</a>
+    <a id="navi_item" href="/about" class="menu-item-link">about</a>
+    <a id="navi_item" href="/search" class="menu-item-link">search</a>
+</div>
+
+<hr/>
+
+
+  <div class="main">
+    <post>
+
+  <div class="post_title">
+    electron写一个记事本app
+  </div>
+
+  <br/><br/>
+
+  <div id="post_content">
+    <p>写在前面：</p>
+<p>我是在学习Electron的时候，看到了<a href="https://www.jianshu.com/p/57d910008612" target="_blank" rel="noopener">Electron: 从零开始写一个记事本app</a>，然后就想模仿这篇文章，熟悉一下Electron，在实现的过程中，感觉这个记事本app可以写得更好，于是做了改进。对原文感兴趣的，可以直接点进去看。</p>
+<blockquote>
+<p>Electron是GitHub开发的一个开源框架。它允许使用Node.js（作为后端）和Chromium（作为前端）完成桌面GUI应用程序的开发。Electron现已被多个开源Web应用程序用于前端与后端的开发，著名项目包括GitHub的Atom和微软的Visual Studio Code。</p>
+</blockquote>
+<p>因为使用了Chromium作为前端，因此制作后的软件即使很简单，也会特别小，但也因为Chromium跨平台，因此Electron也可以跨平台开发。</p>
+<h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h3><p>和原文的记事本app相同</p>
+<p><strong>主菜单：</strong>包括<code>File</code>, <code>Edit</code>, <code>View</code>, <code>Help</code>四个主菜单。重点是<code>File</code>菜单下的三个子菜单：<code>New</code>（新建文件）、<code>Open</code>（打开文件）、<code>Save</code>（保存文件），这三个菜单需要自定义点击事件，其它的菜单基本使用内建的方法处理，所以没什么难度。</p>
+<p><strong>文本框：</strong>用于文本编辑。这也是这个App上的唯一一个组件，它的宽和高自动平铺满整个窗口大小。当修改了文本框中的文字后，会在App标题栏上最右侧添加一个<code>*</code>号以表示文档尚未保存。</p>
+<p><strong>加载和保存文本：</strong>可以打开本地文本文件，支持<code>.txt</code>, <code>.js</code>, <code>.html</code>, <code>.md</code>等文本文件；可以将文本内容保存为本地文本文件。在<strong>打开</strong>或<strong>新建</strong>文件前，如果当前文档尚未保存，会提示用户先保存文档。</p>
+<p><strong>退出程序：</strong>退出窗口或程序时，会检测当前文档是否需要保存，如果尚未保存，提示用户保存。</p>
+<p><strong>右键菜单：</strong>支持右键菜单，可以通过菜单右键执行一些基本的操作，如：复制、粘贴等。<br> 下面是这个记事本App的演示效果，源码下载点击 <a href="https://github.com/XMandarava/Demo-Electron-Notepad" target="_blank" rel="noopener">这里</a>。</p>
+<h3 id="安装electron-forge"><a href="#安装electron-forge" class="headerlink" title="安装electron-forge"></a>安装electron-forge</h3><p>electron-forge是一个类似于傻瓜开发包的Electron工具整合项目</p>
+<p>不得不说，我遇到的第一个难题就是安装electron-forge</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -g cnpm --registry&#x3D;https:&#x2F;&#x2F;registry.npm.taobao.org</span><br><span class="line">cnpm install -g electron</span><br><span class="line">cnpm install -g electron-forge</span><br></pre></td></tr></table></figure>
+
+<p>但我在第三步的时候，一直安装模块失败，可是package.json中一直都没有出现安装失败的模块，导致我也无法使用cnpm install手动安装，最后还是靠了科学上网发现，缺少了electron这个模块，我本来以为全局安装之后就不需要了</p>
+<h3 id="对electron的必需了解"><a href="#对electron的必需了解" class="headerlink" title="对electron的必需了解"></a>对electron的必需了解</h3><p><img src="D:%5CDocuments%5Cgit%5Cbrotaone.github.io%5Cblog%5Csource_posts%5Cnotepad1.png" alt="1586676315786"></p>
+<p>上图是我实际代码的结构图，其中index.js、index.html、index.css是自动生成的，是eleectron应用打开直接能看到的部分</p>
+<p>index.html就是打开的第一个窗口，index.js是主进程执行的js文件，只有在index.js中或index.js引用的模块才是在主进程中运行，其他js文件都会是在渲染进程中运行，并且只有渲染进程才能访问document，直接改变视图</p>
+<p>当打开新的窗口时，就可以创建新的渲染进程。如果主进程需要与渲染进程通信，可以使用mainWindow.webContents.send发送信息，ipcRenderer.on接受信息</p>
+<p>对于主菜单和右键菜单， 每一项可选的属性有role、label、type、click、accelerate（快捷键），electron提供的role包括：</p>
+<ul>
+<li>undo： 撤销</li>
+<li>redo：重做</li>
+<li>cut：剪切</li>
+<li>copy：复制</li>
+<li>paste：粘贴</li>
+<li>pasteAndMatchStyle</li>
+<li>selectAll：全选</li>
+<li>delete：删除</li>
+<li>minimize：当前窗口最小化</li>
+<li>close：关闭当前窗口</li>
+<li>quit：退出应用程序</li>
+<li>reload：刷新当前窗口</li>
+<li>forceReload：强制刷新当前窗口，忽略缓存</li>
+<li>toggleDevTools：打开或者关闭 devtool</li>
+<li>togglefullscreen：进行全屏切换</li>
+<li>resetZoom：重置窗口大小</li>
+<li>zoomIn：放大窗口的10%.</li>
+<li>zoomOut：缩小窗口的10%.</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;设置分隔符</span><br><span class="line">type: &#39;separator&#39;</span><br><span class="line">&#x2F;&#x2F;设置快捷键</span><br><span class="line">accelerator: &#39;CmdOrCtrl+Z&#39;,</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现记事本"><a href="#实现记事本" class="headerlink" title="实现记事本"></a>实现记事本</h3><p>记事本的主体页面，可以将一个textarea全屏显示，去掉outline实现</p>
+<p>然后是主菜单，File菜单下需要实现New、Open、Save功能，因此需要能访问textarea，必须得在渲染进程中运行，但是为了能在第一个界面中就渲染出主菜单，又必须在主进程中载入主菜单，因此必须使用主进程向渲染进程通信，将操作交给渲染进程得回调函数执行</p>
+<p>考虑到软件的模块化，我将主菜单全部的代码放在了appMenuTemplate（原文File仍在index.js中）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> appMenuTemplate = [&#123;</span><br><span class="line">  label: <span class="string">'File'</span>,</span><br><span class="line">  submenu: [&#123;</span><br><span class="line">    label: <span class="string">'New'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'new'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Open'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'open'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Save'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'save'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    type: <span class="string">'separator'</span></span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    role: <span class="string">'quit'</span></span><br><span class="line">  &#125;]</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
+
+<p>然后在index.js中引入模块，为了在模块中访问mainWindow，我将该变量声明在了global全局里</p>
+<p>并且在渲染模块中，newText、 openText等函数也单独写在了utility.js中，减少耦合</p>
+<h3 id="回调的小问题"><a href="#回调的小问题" class="headerlink" title="回调的小问题"></a>回调的小问题</h3><p>可能是由于electron的api更新，对话框函数返回的不再是一个普通对象，而是一个Promise函数。为了得到数据，就要在then方法中插入回调，比如在打开文件函数中</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">openText</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">await</span> askSaveIfNeed();</span><br><span class="line">  <span class="comment">//files是promise对象</span></span><br><span class="line">  <span class="keyword">const</span> files = remote.dialog.showOpenDialog(remote.getCurrentWindow(), &#123;</span><br><span class="line">    filters: [</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">"Text Files"</span>, <span class="attr">extensions</span>: [<span class="string">'txt'</span>, <span class="string">'js'</span>, <span class="string">'html'</span>, <span class="string">'md'</span>] &#125;,</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">'All Files'</span>, <span class="attr">extensions</span>: [<span class="string">'*'</span>] &#125;</span><br><span class="line">    ],</span><br><span class="line">    properties: [<span class="string">'openFile'</span>]</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  files.then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">    currentFile = data.filePaths[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">const</span> txtRead = readText(currentFile);</span><br><span class="line">    txtEditor.value = txtRead;</span><br><span class="line">    <span class="built_in">document</span>.title = <span class="string">"Notepad - "</span> + currentFile;</span><br><span class="line">    isSaved = <span class="literal">true</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>为了能得到文件的路径和文件名，必须在回调函数中设置</p>
+<h3 id="调用的先后问题"><a href="#调用的先后问题" class="headerlink" title="调用的先后问题"></a>调用的先后问题</h3><p>在原文的基础上，改写之后，似乎就差不多，但是进一步测试发现，如果文件未保存的情况下，点击退出即使选择了保存，也会直接退出程序</p>
+<p>这样的情况是由于，electron很多操作都是依赖异步Promise，点击退出后，由于异步操作，导致退出程序先保存对话框运行，任务直接结束运行了，可解决的办法之一是，将删除操作放在回调函数中执行</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'exiting'</span>:</span><br><span class="line">	<span class="comment">//返回的是Promise对象</span></span><br><span class="line">      <span class="keyword">const</span> result = askSaveIfNeed();</span><br><span class="line">      result.then(<span class="function"><span class="params">()</span> =&gt;</span> ipcRenderer.sendSync(<span class="string">'reqaction'</span>, <span class="string">'exit'</span>));</span><br><span class="line">      <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
+
+
+  </div>
+
+  <br/><br/><br/><br/>
+
+  
+
+  <div class="copyright" >
+
+    <a class="license-image" rel="license" href="http://creativecommons.org/licenses/by
+-nc
+-sa
+/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+
+    <div>
+
+      <p>本作品采用
+
+      <a class="license-word-hyper" rel="license" href="http://creativecommons.org/licenses/by
+-nc
+-sa
+/4.0/">
+        知识共享署名
+-非商业性使用
+-相同方式共享
+4.0 国际许可协议</a>
+
+      进行许可。</p>
+
+    </div>
+
+    </div>
+
+
+  <div id="top">
+    <a href="#">▲</a>
+    <a href="#footer">▼</a>
+</div>
+
+  
+
+
+<div id="comment"></div>
+
+
+
+
+
+</post>
+
+  </div>
+
+  <foot id="footer">
+  <hr class="boldline"/>
+  <p class="center font">
+    &copy - <a href="https://brotaone.github.io">Brota</a> -  2020 - Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">hexo</a>  Themed by <a href="https://github.com/pcrab/hexo-theme-quark" target="_blank" rel="noopener"> quark </a> 
+  </p>
+  <br/>
+</foot>
+
+</body>
+</html>
