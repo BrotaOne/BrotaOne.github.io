@@ -64,14 +64,67 @@
   <br/><br/>
 
   <div id="post_content">
-    <h1 id="深拷贝还是浅拷贝"><a href="#深拷贝还是浅拷贝" class="headerlink" title="深拷贝还是浅拷贝"></a>深拷贝还是浅拷贝</h1><p>深拷贝和浅拷贝的问题，我在第一次参加秋招面试的时候就碰上了，我当时的回答现在已经记不得了，面试之后我看了几个版本的深、浅拷贝代码，但是总是没有完美得方案。</p>
-<p>（浅拷贝非常简单）</p>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">shallowClone</span>(<span class="params">o</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(<span class="keyword">typeof</span> o != <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> o != <span class="string">'function'</span>)</span><br><span class="line">		<span class="keyword">return</span> o;</span><br><span class="line">	<span class="keyword">let</span> obj;</span><br><span class="line">	<span class="keyword">if</span>(o <span class="keyword">instanceof</span> <span class="built_in">Array</span>)</span><br><span class="line">		obj = [];</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		obj = &#123;&#125;;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> i <span class="keyword">in</span> o)</span><br><span class="line">		obj[i] = o[i];</span><br><span class="line">	<span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    <h1 id="深拷贝还是浅拷贝"><a href="#深拷贝还是浅拷贝" class="headerlink" title="深拷贝还是浅拷贝"></a>深拷贝还是浅拷贝</h1><p>深拷贝和浅拷贝的问题，我在第一次参加秋招面试的时候就碰上了，我当时的回答现在已经记不得了，面试之后我看了几个版本的深、浅拷贝代码，觉得不是很难。后来多看了几回自称完美的方案之后，反倒是觉得没有完美的深拷贝方案。</p>
+<h3 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h3><p>（浅拷贝非常简单，第一层属性值如果是引用类型，只拷贝引用）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">shallowClone</span>(<span class="params">o</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>( (<span class="keyword">typeof</span> o !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> o !== <span class="string">'function'</span>) || o === <span class="literal">null</span>)</span><br><span class="line">		<span class="keyword">return</span> o;</span><br><span class="line">	<span class="keyword">let</span> obj;</span><br><span class="line">	<span class="keyword">if</span>(o <span class="keyword">instanceof</span> <span class="built_in">Array</span>)</span><br><span class="line">		obj = [];</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		obj = &#123;&#125;;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> i <span class="keyword">in</span> o)</span><br><span class="line">		obj[i] = o[i];</span><br><span class="line">	<span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>有几个骚操作，在参考【1】中看到的，</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">obj2 = <span class="built_in">Object</span>.assign(&#123;&#125;, obj1)</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;...obj2&#125; &#x3D; obj1</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;仅限数组</span><br><span class="line">arr2 &#x3D; arr1.slice(0);</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;同仅限数组</span><br><span class="line">arr2 &#x3D; [].concat(arr1);</span><br></pre></td></tr></table></figure>
+
+
 
 <blockquote>
+<p>实际上对于数组来说， 只要不修改原数组， 重新返回一个新数组就可以实现浅拷贝，比如说map、filter、reduce等方法</p>
+<p>摘自参考【1】</p>
+</blockquote>
+<h3 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h3><blockquote>
 <p>一般来说 JS 深克隆要考虑下面几个问题：</p>
 <p>JSON 克隆不支持函数、引用、undefined、Date、RegExp 等<br>递归克隆要考虑环、爆栈<br>要考虑 Date、RegExp、Function 等特殊对象的克隆方式<br>要不要克隆 <strong>proto</strong>，如果要克隆，就非常浪费内存；如果不克隆，就不是深克隆。</p>
+<p>摘自参考【2】</p>
 </blockquote>
+<p>因为上述问题的存在，尤其是proto的问题，导致真正意义上的深拷贝很难，递归克隆、Date、RegExp、Function、Error都还有解决的办法，虽然Function的办法依然不完美，使用bind方法（参考【3】）得到的函数本质上还是用了拷贝引用</p>
+<h5 id="暴力不负责实现"><a href="#暴力不负责实现" class="headerlink" title="暴力不负责实现"></a>暴力不负责实现</h5><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">JSON</span>.parse( <span class="built_in">JSON</span>.stringify(obj))</span><br></pre></td></tr></table></figure>
+
+<p>缺点（摘自参考【1】）：</p>
+<ol>
+<li>会忽略 undefined</li>
+<li>会忽略 symbol</li>
+<li>不能序列化函数</li>
+<li>不能解决循环引用的对象</li>
+<li>不能正确处理new Date()</li>
+<li>不能处理正则</li>
+<li>不能处理new Error()</li>
+</ol>
+<h5 id="较为完善解法"><a href="#较为完善解法" class="headerlink" title="较为完善解法"></a>较为完善解法</h5><p>先上代码（代码主要来自参考【1】，懒，只添加了函数判断、cache.filter换成的find方法）</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepCopy</span>(<span class="params">obj, cache = []</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (obj === <span class="literal">null</span> || (<span class="keyword">typeof</span> obj !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> obj !== <span class="string">'function'</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Date]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object RegExp]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">RegExp</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Error]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Error</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> obj === <span class="string">'function'</span>) <span class="keyword">return</span> obj.bind(&#123;&#125;);</span><br><span class="line">  <span class="keyword">const</span> item = cache.find(<span class="function"><span class="params">item</span> =&gt;</span> item.original === obj)</span><br><span class="line">  <span class="keyword">if</span> (item) <span class="keyword">return</span> item.copy</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> copy = <span class="built_in">Array</span>.isArray(obj) ? [] : &#123;&#125;</span><br><span class="line">  cache.push(&#123;</span><br><span class="line">    original: obj,</span><br><span class="line">    copy</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Object</span>.keys(obj).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    copy[key] = deepCopy(obj[key], cache)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> copy</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先，如果变量是基本数据类型，直接返回原值</p>
+<p>如果是特殊对象，Date、RegExp、Error，则通过原值新建变量，如果是Function，通过bind方式可以得到一个新函数，并且这里有一个矛盾</p>
+<p>如果把函数真正意义上拷贝了下来，对比闭包中的函数怎么解决变量引用的问题？我目前没有了解到js中提供闭包内函数对父级函数的引用</p>
+<p>由于bind本质上是在对象上添加了函数的索引，然后再通过对象调用函数的方法实现了修改this指针，因此还是是使用了函数引用，因此闭包可以正常访问</p>
+<p>对于递归引用的问题，使用了数组记录所有拷贝过的对象，如果有重复引用，就直接返回拷贝过的值。除了数组，还可以用Map记录</p>
+<p>缺点：</p>
+<ol>
+<li>依然没有拷贝proto</li>
+<li>Function拷贝不完美</li>
+</ol>
+<p>如果有更好的办法，还会继续更新</p>
+<p>参考：</p>
+<p>【1】<a href="https://juejin.im/post/5e906ab8518825738e217414" target="_blank" rel="noopener">JavaScript系列： 一、手撕JS中的深浅拷贝</a></p>
+<p>【2】<a href="https://www.zhihu.com/question/64703741/answer/223375284" target="_blank" rel="noopener">JavaScript深克隆-方应杭-知乎回答</a></p>
+<p>【3】<a href="https://stackoverflow.com/questions/1833588/javascript-clone-a-function" target="_blank" rel="noopener">bind方法拷贝函数</a></p>
 
   </div>
 
