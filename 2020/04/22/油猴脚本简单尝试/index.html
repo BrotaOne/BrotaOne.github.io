@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>
+    Brota  - 油猴脚本简单尝试 
+  </title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+   
+<link rel="stylesheet" href="/css/style.css">
+
+  <link
+    href="https://google-fonts.mirrors.sjtug.sjtu.edu.cn/css?family=Noto+Sans+SC&display=swap"
+    rel="stylesheet"
+  />
+
+    
+<link rel="stylesheet" href="/css/iDisqus.min.css">
+ 
+<script src="/js/iDisqus.min.js"></script>
+
+
+  <script>
+    var disq = new iDisqus("comment", {
+      forum: "pcrab-blog",
+      api: "https://disqus.pcrab.ml",
+      site: "https://pcrab.ml",
+      mode: 1,
+      timeout: 3000,
+      init: true
+    })
+  </script>
+   
+
+  <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+  <div class="title">
+  <img class="title_img" src="https://brotaone.github.io/images/icon.png" /><br />
+  <p id="site_title">&nbspBrota&nbsp</p>
+</div>
+
+  <div class="navi">
+    <a id="navi_item" href="/#" class="menu-item-link">Home</a>
+    <a id="navi_item" href="/tags" class="menu-item-link">tags</a>
+    <a id="navi_item" href="/about" class="menu-item-link">about</a>
+    <a id="navi_item" href="/search" class="menu-item-link">search</a>
+</div>
+
+<hr/>
+
+
+  <div class="main">
+    <post>
+
+  <div class="post_title">
+    油猴脚本简单尝试
+  </div>
+
+  <br/><br/>
+
+  <div id="post_content">
+    <p>如果要问我最强的网页浏览器是什么，Android、IOS、MacOS我不知道，但是其他平台（Windows、Linux）必须是Chrome，不仅仅是出色的性能、丰富的插件，单单是一个油猴插件（Greasemonkey，简称 GM，可以简单理解为脚本管理器），就能实现其他浏览器难以完成的功能（当然此处不包括一些换皮浏览器）。</p>
+<p>油猴插件的介绍：</p>
+<blockquote>
+<p>通过给油猴管理器安装各类脚本，可以让大部分 HTML 为主的网页更方便易用，比如：全速下载网盘文件、去广告、悬停显示大图、Flash/HTML5 播放器转换、阅读模式等。有点像给 Chrome 的插件装上插件</p>
+</blockquote>
+<p>油猴插件自带三个商店<a href="https://greasyfork.org/" target="_blank" rel="noopener">GreasyFork</a> 、<a href="https://openuserjs.org/" target="_blank" rel="noopener">OpenUserJS</a>、<a href="https://gist.github.com/search?l=JavaScript&o=desc&q=" target="_blank" rel="noopener"%3D%3DUserScript%3D%3D"&s=updated">Github 和 Gist</a></p>
+<p>我通常会选择<a href="https://greasyfork.org/" target="_blank" rel="noopener">GreasyFork</a>，网页是中文的，而且搜索起来也很方便，从研一开始使用以来，现在长期使用的插件已经有将近十个了，由于去年开始学习前端，发觉油猴脚本的编写也是用的前端技术，于是就萌生了自己写几个油猴插件的想法。</p>
+<h3 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h3><p>在油猴脚本右键可以添加脚本，然后就会使用默认模板，在模板基础上编写脚本</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ==UserScript==</span></span><br><span class="line"><span class="comment">// @name         New Userscript</span></span><br><span class="line"><span class="comment">// @namespace    http://tampermonkey.net/</span></span><br><span class="line"><span class="comment">// @version      0.1</span></span><br><span class="line"><span class="comment">// @description  try to take over the world!</span></span><br><span class="line"><span class="comment">// @author       You</span></span><br><span class="line"><span class="comment">// @match        http://*/*</span></span><br><span class="line"><span class="comment">// @grant        none</span></span><br><span class="line"><span class="comment">// ==/UserScript==</span></span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    'use strict'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Your code here...</span></span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<p>油猴脚本的API可以在<a href="https://www.tampermonkey.net/documentation.php?ext=dhdg" target="_blank" rel="noopener">官方文档</a>中查看，也可以选择个人编写的文档，<a href="https://juejin.im/post/5dbf92f95188252a9f2fbe2b" target="_blank" rel="noopener">Tampermonkey油猴用户脚本API文档</a>，我只打算写几个我觉得常用的参数</p>
+<p>其中，match是匹配的网站，可以写多个，只要匹配中一个即可，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@require https:&#x2F;&#x2F;code.jquery.com&#x2F;jquery-2.1.4.min.js</span><br><span class="line">@resource icon2 &#x2F;images&#x2F;icon.png</span><br><span class="line">&#x2F;&#x2F; @grant unsafeWindow</span><br><span class="line">&#x2F;&#x2F; @grant window.close</span><br></pre></td></tr></table></figure>
+
+<p>@require<br>表示在运行脚本前需要加载和运行的JavaScript文件。允许设置多个。</p>
+<p>@resource<br>定义一些需要预加载的资源文件，这些资源可以在脚本中通过GM_getResourceURL，GM_getResourceText访问。允许设置多个。</p>
+<p>@run-at<br>设置注入脚本的时间。<br>    @run-at document-start<br>    @run-at document-body<br>    @run-at document-end<br>    @run-at document-idle<br>    @run-at content-menu </p>
+<p>@grant<br>@grant标签用于设置GM_*方法， unsafeWindow对象， window对象方法的白名单。<br>unsafeWindow用于操纵和替换原页面中的js函数或者js 变量值</p>
+<h3 id="小实验"><a href="#小实验" class="headerlink" title="小实验"></a>小实验</h3><h4 id="知乎去侧边栏"><a href="#知乎去侧边栏" class="headerlink" title="知乎去侧边栏"></a>知乎去侧边栏</h4><p>打开知乎首页，可以明显看到除了问题回答的主题内容外，还有一个侧边栏，主要包括有回答问题、写文章、创作者中心，对于只看回答、 不注定创作的使用者来说不是很方便，不如去掉，然后把主题内容的宽度增加，还可以增加有用区域。</p>
+<p>需要拦截的网站有主页，还有看文章和专栏的页面，由于我的正则学得不好，因此只会最简单无脑的方式，匹配如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;www.zhihu.com&#x2F;</span><br><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;www.zhihu.com&#x2F;*</span><br><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;*</span><br></pre></td></tr></table></figure>
+
+<p>最简单那的方法，就是把侧边栏去除显示，然后扩大主体的宽度。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;主页的主体和侧边</span><br><span class="line">document.querySelector(&#39;.GlobalSideBar&#39;).style.display &#x3D; &#39;none&#39;;</span><br><span class="line">document.querySelector(&#39;.Topstory-mainColumn&#39;).style.width &#x3D; &#39;1000px&#39;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;具体问题的主体和侧边</span><br><span class="line">document.querySelector(&#39;.Question-sideColumn&#39;).style.display &#x3D; &#39;none&#39;;</span><br><span class="line">document.querySelector(&#39;.Question-mainColumn&#39;).style.width &#x3D; &#39;auto&#39;;</span><br></pre></td></tr></table></figure>
+
+<p>方法很简单粗暴，但是有两个问题</p>
+<p>第一，主页和具体问题网页主题和侧边的类名不一样，因此需要执行的代码不一样，虽然可以在脚本根据网站不同选择执行，但是对于我这样一个问题，显得有些麻烦，但是如果不分网页直接执行，会由于访问不存在对象的属性报错，而无法继续执行，可解决的办法之一是放在try catch代码块中</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">try</span>&#123;     </span><br><span class="line">	<span class="built_in">document</span>.querySelector(<span class="string">'.GlobalSideBar'</span>).style.display = <span class="string">'none'</span>;</span><br><span class="line">	<span class="built_in">document</span>.querySelector(<span class="string">'.Topstory-mainColumn'</span>).style.width = <span class="string">'1000px'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(e)&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">	<span class="built_in">document</span>.querySelector(<span class="string">'.Question-sideColumn'</span>).style.display = <span class="string">'none'</span>;</span><br><span class="line"> 	<span class="built_in">document</span>.querySelector(<span class="string">'.Question-mainColumn'</span>).style.width = <span class="string">'auto'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(e)&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二，由于网页加载是一个逐步的过程，样式的加入是在html中加入，脚本必须在内容加载完后执行，@run-at要设置在document-end，因此导致网页加载完后还有一个明显的重排现象</p>
+<p>比较好的解决办法是，在head中插入样式，而不是html元素中写入</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> style = <span class="built_in">document</span>.createElement(<span class="string">'style'</span>);</span><br><span class="line">style.innerHTML = <span class="string">`.GlobalSideBar,.Question-sideColumn&#123;</span></span><br><span class="line"><span class="string">		display:none;</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">	.Topstory-mainColumn&#123;</span></span><br><span class="line"><span class="string">		width:1000px;</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">	.Question-mainColumn&#123;</span></span><br><span class="line"><span class="string">		width:1000px;</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="built_in">document</span>.head.append(style);</span><br></pre></td></tr></table></figure>
+
+<p>同样的思路，也可以去除使用Adblock后知乎的拦截提示</p>
+<h4 id="知乎夜间模式"><a href="#知乎夜间模式" class="headerlink" title="知乎夜间模式"></a>知乎夜间模式</h4><p>思路与去除侧边栏类似，也是在head中增加style标签，将背景设置为黑色，位置设置为对比度高的颜色</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> text = <span class="string">`</span></span><br><span class="line"><span class="string">		body,.AppHeader,.Card,.ContentItem-actions,.Comments-container,.CommentsV2,.Topbar,.CommentTopbar,</span></span><br><span class="line"><span class="string">		.CommentListV2-header-divider,.CommentsV2-footer,.CommentEditorV2--normal,.CommentEditorV2--active,</span></span><br><span class="line"><span class="string">		.CommentEditorV2-inputWrap, .CommentEditorV2-inputWrap--active,.RichText, .RichText--editable, .RichText--clearBoth,</span></span><br><span class="line"><span class="string">		.QuestionHeader,.QuestionHeader-footer,</span></span><br><span class="line"><span class="string">        .Post-content,.ColumnPageHeader,pre,.Recommendations-Main,.RichContent-actions.is-fixed&#123;</span></span><br><span class="line"><span class="string">			background:#000 !important;</span></span><br><span class="line"><span class="string">		&#125;</span></span><br><span class="line"><span class="string">		a[rel],a[data-za-detail-view-element_name]&#123;</span></span><br><span class="line"><span class="string">			color:#8590a6 !important;</span></span><br><span class="line"><span class="string">		&#125;</span></span><br><span class="line"><span class="string">		body,.CommentEditorV2-inputWrap, .CommentEditorV2-inputWrap--active,.QuestionHeader-title&#123;</span></span><br><span class="line"><span class="string">			color:#fff !important;</span></span><br><span class="line"><span class="string">		&#125;</span></span><br><span class="line"><span class="string">        #changeDark:hover&#123;</span></span><br><span class="line"><span class="string">            background: #2e2e2e !important;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">	`</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这里我模仿了<a href="https://greasyfork.org/zh-CN/scripts/28497-remove-web-limits-modified" target="_blank" rel="noopener">网页限制解除(改)</a>，在网页上增加了一个夜间模式开关，通过插入一个div，在div中有有一个复选框表示师傅开启夜间模式，绑定点击事件，修改style中的内容，来决定是否开启，并且使用localSotrage记忆夜间模式开关。</p>
+<p>但是，还有一个问题没有解决，就是知乎的搜索框，当鼠标点击搜索之后，会出现新的白色框，但是当我想查看白色框的类名时，搜索框失焦，于是白色框就消失了，我通过chrome的开发者工具实验，发现应该不是纯css样式，是js+css实现的，于是我就拿不到类名修改背景了，导致连白色背景、白色字，连字都看不清</p>
+<p>。。。等日后更新这个bug吧</p>
+
+  </div>
+
+  <br/><br/><br/><br/>
+
+  
+
+  <div class="copyright" >
+
+    <a class="license-image" rel="license" href="http://creativecommons.org/licenses/by
+-nc
+-sa
+/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+
+    <div>
+
+      <p>本作品采用
+
+      <a class="license-word-hyper" rel="license" href="http://creativecommons.org/licenses/by
+-nc
+-sa
+/4.0/">
+        知识共享署名
+-非商业性使用
+-相同方式共享
+4.0 国际许可协议</a>
+
+      进行许可。</p>
+
+    </div>
+
+    </div>
+
+
+  <div id="top">
+    <a href="#">▲</a>
+    <a href="#footer">▼</a>
+</div>
+
+  
+
+
+<div id="comment"></div>
+
+
+
+
+
+</post>
+
+  </div>
+
+  <foot id="footer">
+  <hr class="boldline"/>
+  <p class="center font">
+    &copy - <a href="https://brotaone.github.io">Brota</a> -  2020 - Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">hexo</a>  Themed by <a href="https://github.com/pcrab/hexo-theme-quark" target="_blank" rel="noopener"> quark </a> 
+  </p>
+  <br/>
+</foot>
+
+</body>
+</html>
