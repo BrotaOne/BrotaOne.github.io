@@ -1,432 +1,221 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title>油猴脚本简单尝试</title>
-    <url>/2020/04/22/%E6%B2%B9%E7%8C%B4%E8%84%9A%E6%9C%AC%E7%AE%80%E5%8D%95%E5%B0%9D%E8%AF%95/</url>
-    <content><![CDATA[<p>如果要问我最强的网页浏览器是什么，Android、IOS、MacOS我不知道，但是其他平台（Windows、Linux）必须是Chrome，不仅仅是出色的性能、丰富的插件，单单是一个油猴插件（Greasemonkey，简称 GM，可以简单理解为脚本管理器），就能实现其他浏览器难以完成的功能（当然此处不包括一些换皮浏览器）。</p>
-<p>油猴插件的介绍：</p>
-<blockquote>
-<p>通过给油猴管理器安装各类脚本，可以让大部分 HTML 为主的网页更方便易用，比如：全速下载网盘文件、去广告、悬停显示大图、Flash/HTML5 播放器转换、阅读模式等。有点像给 Chrome 的插件装上插件</p>
-</blockquote>
-<p>油猴插件自带三个商店<a href="https://greasyfork.org/" target="_blank" rel="noopener">GreasyFork</a> 、<a href="https://openuserjs.org/" target="_blank" rel="noopener">OpenUserJS</a>、<a href="https://gist.github.com/search?l=JavaScript&o=desc&q=" target="_blank" rel="noopener"%3D%3DUserScript%3D%3D"&s=updated">Github 和 Gist</a></p>
-<p>我通常会选择<a href="https://greasyfork.org/" target="_blank" rel="noopener">GreasyFork</a>，网页是中文的，而且搜索起来也很方便，从研一开始使用以来，现在长期使用的插件已经有将近十个了，由于去年开始学习前端，发觉油猴脚本的编写也是用的前端技术，于是就萌生了自己写几个油猴插件的想法。</p>
-<h3 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h3><p>在油猴脚本右键可以添加脚本，然后就会使用默认模板，在模板基础上编写脚本</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ==UserScript==</span></span><br><span class="line"><span class="comment">// @name         New Userscript</span></span><br><span class="line"><span class="comment">// @namespace    http://tampermonkey.net/</span></span><br><span class="line"><span class="comment">// @version      0.1</span></span><br><span class="line"><span class="comment">// @description  try to take over the world!</span></span><br><span class="line"><span class="comment">// @author       You</span></span><br><span class="line"><span class="comment">// @match        http://*/*</span></span><br><span class="line"><span class="comment">// @grant        none</span></span><br><span class="line"><span class="comment">// ==/UserScript==</span></span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    'use strict'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Your code here...</span></span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
-
-<p>油猴脚本的API可以在<a href="https://www.tampermonkey.net/documentation.php?ext=dhdg" target="_blank" rel="noopener">官方文档</a>中查看，也可以选择个人编写的文档，<a href="https://juejin.im/post/5dbf92f95188252a9f2fbe2b" target="_blank" rel="noopener">Tampermonkey油猴用户脚本API文档</a>，我只打算写几个我觉得常用的参数</p>
-<p>其中，match是匹配的网站，可以写多个，只要匹配中一个即可，</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">@require https:&#x2F;&#x2F;code.jquery.com&#x2F;jquery-2.1.4.min.js</span><br><span class="line">@resource icon2 &#x2F;images&#x2F;icon.png</span><br><span class="line">&#x2F;&#x2F; @grant unsafeWindow</span><br><span class="line">&#x2F;&#x2F; @grant window.close</span><br></pre></td></tr></table></figure>
-
-<p>@require<br>表示在运行脚本前需要加载和运行的JavaScript文件。允许设置多个。</p>
-<p>@resource<br>定义一些需要预加载的资源文件，这些资源可以在脚本中通过GM_getResourceURL，GM_getResourceText访问。允许设置多个。</p>
-<p>@run-at<br>设置注入脚本的时间。<br>    @run-at document-start<br>    @run-at document-body<br>    @run-at document-end<br>    @run-at document-idle<br>    @run-at content-menu </p>
-<p>@grant<br>@grant标签用于设置GM_*方法， unsafeWindow对象， window对象方法的白名单。<br>unsafeWindow用于操纵和替换原页面中的js函数或者js 变量值</p>
-<h3 id="小实验"><a href="#小实验" class="headerlink" title="小实验"></a>小实验</h3><h4 id="知乎去侧边栏"><a href="#知乎去侧边栏" class="headerlink" title="知乎去侧边栏"></a>知乎去侧边栏</h4><p>打开知乎首页，可以明显看到除了问题回答的主题内容外，还有一个侧边栏，主要包括有回答问题、写文章、创作者中心，对于只看回答、 不注定创作的使用者来说不是很方便，不如去掉，然后把主题内容的宽度增加，还可以增加有用区域。</p>
-<p>需要拦截的网站有主页，还有看文章和专栏的页面，由于我的正则学得不好，因此只会最简单无脑的方式，匹配如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;www.zhihu.com&#x2F;</span><br><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;www.zhihu.com&#x2F;*</span><br><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;*</span><br></pre></td></tr></table></figure>
-
-<p>最简单那的方法，就是把侧边栏去除显示，然后扩大主体的宽度。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;主页的主体和侧边</span><br><span class="line">document.querySelector(&#39;.GlobalSideBar&#39;).style.display &#x3D; &#39;none&#39;;</span><br><span class="line">document.querySelector(&#39;.Topstory-mainColumn&#39;).style.width &#x3D; &#39;1000px&#39;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;具体问题的主体和侧边</span><br><span class="line">document.querySelector(&#39;.Question-sideColumn&#39;).style.display &#x3D; &#39;none&#39;;</span><br><span class="line">document.querySelector(&#39;.Question-mainColumn&#39;).style.width &#x3D; &#39;auto&#39;;</span><br></pre></td></tr></table></figure>
-
-<p>方法很简单粗暴，但是有两个问题</p>
-<p>第一，主页和具体问题网页主题和侧边的类名不一样，因此需要执行的代码不一样，虽然可以在脚本根据网站不同选择执行，但是对于我这样一个问题，显得有些麻烦，但是如果不分网页直接执行，会由于访问不存在对象的属性报错，而无法继续执行，可解决的办法之一是放在try catch代码块中</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"> <span class="keyword">try</span>&#123;     </span><br><span class="line">	<span class="built_in">document</span>.querySelector(<span class="string">'.GlobalSideBar'</span>).style.display = <span class="string">'none'</span>;</span><br><span class="line">	<span class="built_in">document</span>.querySelector(<span class="string">'.Topstory-mainColumn'</span>).style.width = <span class="string">'1000px'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(e)&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line">	<span class="built_in">document</span>.querySelector(<span class="string">'.Question-sideColumn'</span>).style.display = <span class="string">'none'</span>;</span><br><span class="line"> 	<span class="built_in">document</span>.querySelector(<span class="string">'.Question-mainColumn'</span>).style.width = <span class="string">'auto'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(e)&#123;&#125;</span><br></pre></td></tr></table></figure>
-
-<p>第二，由于网页加载是一个逐步的过程，样式的加入是在html中加入，脚本必须在内容加载完后执行，@run-at要设置在document-end，因此导致网页加载完后还有一个明显的重排现象</p>
-<p>比较好的解决办法是，在head中插入样式，而不是html元素中写入</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> style = <span class="built_in">document</span>.createElement(<span class="string">'style'</span>);</span><br><span class="line">style.innerHTML = <span class="string">`.GlobalSideBar,.Question-sideColumn&#123;</span></span><br><span class="line"><span class="string">		display:none;</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">	.Topstory-mainColumn&#123;</span></span><br><span class="line"><span class="string">		width:1000px;</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">	.Question-mainColumn&#123;</span></span><br><span class="line"><span class="string">		width:1000px;</span></span><br><span class="line"><span class="string">	&#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="built_in">document</span>.head.append(style);</span><br></pre></td></tr></table></figure>
-
-<p>同样的思路，也可以去除使用Adblock后知乎的拦截提示</p>
-<h4 id="知乎夜间模式"><a href="#知乎夜间模式" class="headerlink" title="知乎夜间模式"></a>知乎夜间模式</h4><p>思路与去除侧边栏类似，也是在head中增加style标签，将背景设置为黑色，位置设置为对比度高的颜色</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> text = <span class="string">`</span></span><br><span class="line"><span class="string">		body,.AppHeader,.Card,.ContentItem-actions,.Comments-container,.CommentsV2,.Topbar,.CommentTopbar,</span></span><br><span class="line"><span class="string">		.CommentListV2-header-divider,.CommentsV2-footer,.CommentEditorV2--normal,.CommentEditorV2--active,</span></span><br><span class="line"><span class="string">		.CommentEditorV2-inputWrap, .CommentEditorV2-inputWrap--active,.RichText, .RichText--editable, .RichText--clearBoth,</span></span><br><span class="line"><span class="string">		.QuestionHeader,.QuestionHeader-footer,</span></span><br><span class="line"><span class="string">        .Post-content,.ColumnPageHeader,pre,.Recommendations-Main,.RichContent-actions.is-fixed&#123;</span></span><br><span class="line"><span class="string">			background:#000 !important;</span></span><br><span class="line"><span class="string">		&#125;</span></span><br><span class="line"><span class="string">		a[rel],a[data-za-detail-view-element_name]&#123;</span></span><br><span class="line"><span class="string">			color:#8590a6 !important;</span></span><br><span class="line"><span class="string">		&#125;</span></span><br><span class="line"><span class="string">		body,.CommentEditorV2-inputWrap, .CommentEditorV2-inputWrap--active,.QuestionHeader-title&#123;</span></span><br><span class="line"><span class="string">			color:#fff !important;</span></span><br><span class="line"><span class="string">		&#125;</span></span><br><span class="line"><span class="string">        #changeDark:hover&#123;</span></span><br><span class="line"><span class="string">            background: #2e2e2e !important;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">	`</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这里我模仿了<a href="https://greasyfork.org/zh-CN/scripts/28497-remove-web-limits-modified" target="_blank" rel="noopener">网页限制解除(改)</a>，在网页上增加了一个夜间模式开关，通过插入一个div，在div中有有一个复选框表示师傅开启夜间模式，绑定点击事件，修改style中的内容，来决定是否开启，并且使用localSotrage记忆夜间模式开关。</p>
-<p>但是，还有一个问题没有解决，就是知乎的搜索框，当鼠标点击搜索之后，会出现新的白色框，但是当我想查看白色框的类名时，搜索框失焦，于是白色框就消失了，我通过chrome的开发者工具实验，发现应该不是纯css样式，是js+css实现的，于是我就拿不到类名修改背景了，导致连白色背景、白色字，连字都看不清</p>
-<p>。。。等日后更新这个bug吧</p>
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-        <tag>Chrome</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>parcel简单使用</title>
-    <url>/2020/04/17/parcel%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</url>
-    <content><![CDATA[<p>parcel是我在看方应航方老师的视频<a href="https://www.bilibili.com/video/BV1kE411N7wK/?p=7" target="_blank" rel="noopener">HTML/CSS/JS写自己的简历</a>，中使用的web应用打包工具，同时在<a href="https://www.bilibili.com/video/BV1kE411N7wK/?p=7" target="_blank" rel="noopener">他的GitHub</a>中也有简历模板</p>
-<p><a href="https://parceljs.bootcss.com/" target="_blank" rel="noopener">parcel官网</a>的定位是”极速零配置Web应用打包工具“，特点是：极速打包、零配置代码拆分、热模块替换，相比Webpack上手难度低</p>
-<p>安装方法</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//全局安装</span><br><span class="line">npm install -g parcel-bundler</span><br><span class="line">//安装到项目</span><br><span class="line">npm install -S parcel-bundler</span><br></pre></td></tr></table></figure>
-
-<p>开启服务器</p>
-<p>对于一个仅包含html、js的网站</p>
-<p>index.html</p>
-<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./index.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>index.js</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">'hello world'</span>)</span><br></pre></td></tr></table></figure>
-
-<p>开启服务器，默认支持热模块替换</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">//仅安装在项目中，需加上npx，或运行package.json中的scripts</span><br><span class="line">parcel index.html</span><br></pre></td></tr></table></figure>
-
-<p>修改端口</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">-p &lt;port number&gt;</span><br></pre></td></tr></table></figure>
-
-<p>也可以使用自动重新构建，但不会开启服务器</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">parcel watch index.html</span><br></pre></td></tr></table></figure>
-
-<p>脚本任务</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;scripts&quot;: &#123;</span><br><span class="line">    &quot;dev&quot;: &quot;parcel &lt;your entry file&gt;&quot;,</span><br><span class="line">    &quot;build&quot;: &quot;parcel build &lt;your entry file&gt;&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>移动端适配</title>
-    <url>/2020/04/16/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E9%80%82%E9%85%8D/</url>
-    <content><![CDATA[<p>由于现在上网设备已不局限于PC，手机、平板，甚至手表也可以浏览网页，然而这些设备的屏幕尺寸差异很大，如果按照以前的PC布局，那么网页要么太小要么需要来回拖动，可视内容非常小，于是就诞生了移动端适配问题。</p>
-<p>移动端适配问题包括有：</p>
-<ul>
-<li><code>1px</code>问题</li>
-<li><code>UI</code>图完美适配方案</li>
-<li><code>iPhoneX</code>适配方案</li>
-<li>横屏适配</li>
-<li>高清屏图片模糊问题</li>
-<li>…</li>
-</ul>
-<p>参考文献：</p>
-<p><a href="https://juejin.im/post/5cddf289f265da038f77696c" target="_blank" rel="noopener">关于移动端适配，你必须要知道的</a></p>
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>electron写一个记事本app</title>
-    <url>/2020/04/12/electron%E5%86%99%E4%B8%80%E4%B8%AA%E8%AE%B0%E4%BA%8B%E6%9C%ACapp/</url>
-    <content><![CDATA[<p>写在前面：</p>
-<p>我是在学习Electron的时候，看到了<a href="https://www.jianshu.com/p/57d910008612" target="_blank" rel="noopener">Electron: 从零开始写一个记事本app</a>，然后就想模仿这篇文章，熟悉一下Electron，在实现的过程中，感觉这个记事本app可以写得更好，于是做了改进。对原文感兴趣的，可以直接点进去看。</p>
-<blockquote>
-<p>Electron是GitHub开发的一个开源框架。它允许使用Node.js（作为后端）和Chromium（作为前端）完成桌面GUI应用程序的开发。Electron现已被多个开源Web应用程序用于前端与后端的开发，著名项目包括GitHub的Atom和微软的Visual Studio Code。</p>
-</blockquote>
-<p>因为使用了Chromium作为前端，因此制作后的软件即使很简单，也会特别小，但也因为Chromium跨平台，因此Electron也可以跨平台开发。</p>
-<h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h3><p>和原文的记事本app相同</p>
-<p><strong>主菜单：</strong>包括<code>File</code>, <code>Edit</code>, <code>View</code>, <code>Help</code>四个主菜单。重点是<code>File</code>菜单下的三个子菜单：<code>New</code>（新建文件）、<code>Open</code>（打开文件）、<code>Save</code>（保存文件），这三个菜单需要自定义点击事件，其它的菜单基本使用内建的方法处理，所以没什么难度。</p>
-<p><strong>文本框：</strong>用于文本编辑。这也是这个App上的唯一一个组件，它的宽和高自动平铺满整个窗口大小。当修改了文本框中的文字后，会在App标题栏上最右侧添加一个<code>*</code>号以表示文档尚未保存。</p>
-<p><strong>加载和保存文本：</strong>可以打开本地文本文件，支持<code>.txt</code>, <code>.js</code>, <code>.html</code>, <code>.md</code>等文本文件；可以将文本内容保存为本地文本文件。在<strong>打开</strong>或<strong>新建</strong>文件前，如果当前文档尚未保存，会提示用户先保存文档。</p>
-<p><strong>退出程序：</strong>退出窗口或程序时，会检测当前文档是否需要保存，如果尚未保存，提示用户保存。</p>
-<p><strong>右键菜单：</strong>支持右键菜单，可以通过菜单右键执行一些基本的操作，如：复制、粘贴等。<br> 下面是这个记事本App的演示效果，源码下载点击 <a href="https://github.com/XMandarava/Demo-Electron-Notepad" target="_blank" rel="noopener">这里</a>。</p>
-<h3 id="安装electron-forge"><a href="#安装electron-forge" class="headerlink" title="安装electron-forge"></a>安装electron-forge</h3><p>electron-forge是一个类似于傻瓜开发包的Electron工具整合项目</p>
-<p>不得不说，我遇到的第一个难题就是安装electron-forge</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">npm install -g cnpm --registry&#x3D;https:&#x2F;&#x2F;registry.npm.taobao.org</span><br><span class="line">cnpm install -g electron</span><br><span class="line">cnpm install -g electron-forge</span><br></pre></td></tr></table></figure>
-
-<p>但我在第三步的时候，一直安装模块失败，可是package.json中一直都没有出现安装失败的模块，导致我也无法使用cnpm install手动安装，最后还是靠了科学上网发现，缺少了electron这个模块，我本来以为全局安装之后就不需要了</p>
-<h3 id="对electron的必需了解"><a href="#对electron的必需了解" class="headerlink" title="对electron的必需了解"></a>对electron的必需了解</h3><p><img src="D:%5CDocuments%5Cgit%5Cbrotaone.github.io%5Cblog%5Csource_posts%5Cnotepad1.png" alt="1586676315786"></p>
-<p>上图是我实际代码的结构图，其中index.js、index.html、index.css是自动生成的，是eleectron应用打开直接能看到的部分</p>
-<p>index.html就是打开的第一个窗口，index.js是主进程执行的js文件，只有在index.js中或index.js引用的模块才是在主进程中运行，其他js文件都会是在渲染进程中运行，并且只有渲染进程才能访问document，直接改变视图</p>
-<p>当打开新的窗口时，就可以创建新的渲染进程。如果主进程需要与渲染进程通信，可以使用mainWindow.webContents.send发送信息，ipcRenderer.on接受信息</p>
-<p>对于主菜单和右键菜单， 每一项可选的属性有role、label、type、click、accelerate（快捷键），electron提供的role包括：</p>
-<ul>
-<li>undo： 撤销</li>
-<li>redo：重做</li>
-<li>cut：剪切</li>
-<li>copy：复制</li>
-<li>paste：粘贴</li>
-<li>pasteAndMatchStyle</li>
-<li>selectAll：全选</li>
-<li>delete：删除</li>
-<li>minimize：当前窗口最小化</li>
-<li>close：关闭当前窗口</li>
-<li>quit：退出应用程序</li>
-<li>reload：刷新当前窗口</li>
-<li>forceReload：强制刷新当前窗口，忽略缓存</li>
-<li>toggleDevTools：打开或者关闭 devtool</li>
-<li>togglefullscreen：进行全屏切换</li>
-<li>resetZoom：重置窗口大小</li>
-<li>zoomIn：放大窗口的10%.</li>
-<li>zoomOut：缩小窗口的10%.</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;设置分隔符</span><br><span class="line">type: &#39;separator&#39;</span><br><span class="line">&#x2F;&#x2F;设置快捷键</span><br><span class="line">accelerator: &#39;CmdOrCtrl+Z&#39;,</span><br></pre></td></tr></table></figure>
-
-<h3 id="实现记事本"><a href="#实现记事本" class="headerlink" title="实现记事本"></a>实现记事本</h3><p>记事本的主体页面，可以将一个textarea全屏显示，去掉outline实现</p>
-<p>然后是主菜单，File菜单下需要实现New、Open、Save功能，因此需要能访问textarea，必须得在渲染进程中运行，但是为了能在第一个界面中就渲染出主菜单，又必须在主进程中载入主菜单，因此必须使用主进程向渲染进程通信，将操作交给渲染进程得回调函数执行</p>
-<p>考虑到软件的模块化，我将主菜单全部的代码放在了appMenuTemplate（原文File仍在index.js中）</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> appMenuTemplate = [&#123;</span><br><span class="line">  label: <span class="string">'File'</span>,</span><br><span class="line">  submenu: [&#123;</span><br><span class="line">    label: <span class="string">'New'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'new'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Open'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'open'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Save'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'save'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    type: <span class="string">'separator'</span></span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    role: <span class="string">'quit'</span></span><br><span class="line">  &#125;]</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure>
-
-<p>然后在index.js中引入模块，为了在模块中访问mainWindow，我将该变量声明在了global全局里</p>
-<p>并且在渲染模块中，newText、 openText等函数也单独写在了utility.js中，减少耦合</p>
-<h3 id="回调的小问题"><a href="#回调的小问题" class="headerlink" title="回调的小问题"></a>回调的小问题</h3><p>可能是由于electron的api更新，对话框函数返回的不再是一个普通对象，而是一个Promise函数。为了得到数据，就要在then方法中插入回调，比如在打开文件函数中</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">openText</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">await</span> askSaveIfNeed();</span><br><span class="line">  <span class="comment">//files是promise对象</span></span><br><span class="line">  <span class="keyword">const</span> files = remote.dialog.showOpenDialog(remote.getCurrentWindow(), &#123;</span><br><span class="line">    filters: [</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">"Text Files"</span>, <span class="attr">extensions</span>: [<span class="string">'txt'</span>, <span class="string">'js'</span>, <span class="string">'html'</span>, <span class="string">'md'</span>] &#125;,</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">'All Files'</span>, <span class="attr">extensions</span>: [<span class="string">'*'</span>] &#125;</span><br><span class="line">    ],</span><br><span class="line">    properties: [<span class="string">'openFile'</span>]</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  files.then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">    currentFile = data.filePaths[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">const</span> txtRead = readText(currentFile);</span><br><span class="line">    txtEditor.value = txtRead;</span><br><span class="line">    <span class="built_in">document</span>.title = <span class="string">"Notepad - "</span> + currentFile;</span><br><span class="line">    isSaved = <span class="literal">true</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>为了能得到文件的路径和文件名，必须在回调函数中设置</p>
-<h3 id="调用的先后问题"><a href="#调用的先后问题" class="headerlink" title="调用的先后问题"></a>调用的先后问题</h3><p>在原文的基础上，改写之后，似乎就差不多，但是进一步测试发现，如果文件未保存的情况下，点击退出即使选择了保存，也会直接退出程序</p>
-<p>这样的情况是由于，electron很多操作都是依赖异步Promise，点击退出后，由于异步操作，导致退出程序先保存对话框运行，任务直接结束运行了，可解决的办法之一是，将删除操作放在回调函数中执行</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'exiting'</span>:</span><br><span class="line">	<span class="comment">//返回的是Promise对象</span></span><br><span class="line">      <span class="keyword">const</span> result = askSaveIfNeed();</span><br><span class="line">      result.then(<span class="function"><span class="params">()</span> =&gt;</span> ipcRenderer.sendSync(<span class="string">'reqaction'</span>, <span class="string">'exit'</span>));</span><br><span class="line">      <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-        <tag>Electron</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>js中容易遗忘的知识点（长更）</title>
-    <url>/2020/04/12/js%E4%B8%AD%E5%AE%B9%E6%98%93%E9%81%97%E5%BF%98%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9%EF%BC%88%E9%95%BF%E6%9B%B4%EF%BC%89/</url>
-    <content><![CDATA[<p>记录一下我在js学习中，屡看屡忘的知识点，准备长期更新</p>
-<h5 id="遍历方法"><a href="#遍历方法" class="headerlink" title="遍历方法"></a>遍历方法</h5><table>
-<thead>
-<tr>
-<th align="center">方法</th>
-<th align="left">适用范围</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">for..in</td>
-<td align="left">数组，对象</td>
-<td>获取可枚举的实例和原型属性名</td>
-</tr>
-<tr>
-<td align="center">Object.keys()</td>
-<td align="left">数组，对象</td>
-<td>返回可枚举的实例属性名组成的数组</td>
-</tr>
-<tr>
-<td align="center">Object.getPropertyNames()</td>
-<td align="left">数组，对象</td>
-<td>返回除原型属性以外的所有属性（包括不可枚举的属性）名组成的数组</td>
-</tr>
-<tr>
-<td align="center">for..of</td>
-<td align="left">可迭代对象(Array, Map, Set, arguments等)</td>
-<td>返回属性值</td>
-</tr>
-</tbody></table>
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-        <tag>js</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>面试手写函数1</title>
-    <url>/2020/04/11/%E9%9D%A2%E8%AF%95%E6%89%8B%E5%86%99%E5%87%BD%E6%95%B01/</url>
-    <content><![CDATA[<p>记录一下最近一段时间，参与春招面试碰到的手写函数，巩固一下自己的基础。</p>
-<h3 id="数组去重"><a href="#数组去重" class="headerlink" title="数组去重"></a>数组去重</h3><p>数组去重本来是很容易的，特别是有了Set对象后(arr为要去重的数组)</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">[...new <span class="built_in">Set</span>(arr)]</span><br></pre></td></tr></table></figure>
-
-<p>但是如果加上附加条件、要求性能就挺麻烦了。</p>
-<p>es5大多数解法是通过一个Map记录数组的每一项，然后便利数组，没有重复的就记录下来，只需要一次遍历。</p>
-<p>如果要求在原数组中操作呢？那么删除元素就只有通过splice方法，但是如果对于数组中有1万个0或者[1,1,2,2,3,3,4,4…]，这种数组，一个个删除的效率太低，可以通过冒泡的方法把非重复项移到数组前面，然后截尾即可。</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span>;    </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> j=<span class="number">0</span>; j &lt; arr.length; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!map.has(arr[j])) &#123;</span><br><span class="line">        i != j &amp;&amp; ([arr[i], arr[j]] = [arr[j], arr[i]]);</span><br><span class="line">        map.set(arr[i++], <span class="literal">true</span>);</span><br><span class="line">      &#125;    </span><br><span class="line">  &#125;</span><br><span class="line">  arr.splice(i, arr.length - i)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-
-<p>那如果数组中的每一项都是对象呢？比如：</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">let</span> singers = [</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'Leslie Cheung'</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'Leslie Cheung'</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'Eason Chan'</span> &#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-
-<p>一样也是有骚操作的</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr, key</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> [...new <span class="built_in">Map</span>(arr.map(<span class="function"><span class="params">item</span>=&gt;</span>[item[key],item])).values()]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>一样有不依靠骚操作版本</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr, key</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span>;    </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> j=<span class="number">0</span>; j &lt; arr.length; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!map.has(arr[j][key])) &#123;</span><br><span class="line">        i != j &amp;&amp; ([arr[i], arr[j]] = [arr[j], arr[i]]);</span><br><span class="line">        map.set(arr[i][key], i++);</span><br><span class="line">      &#125;    </span><br><span class="line">  &#125;</span><br><span class="line">  arr.splice(i, arr.length - i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>js深拷贝</title>
-    <url>/2020/04/10/js%E6%B7%B1%E6%8B%B7%E8%B4%9D/</url>
-    <content><![CDATA[<h1 id="深拷贝还是浅拷贝"><a href="#深拷贝还是浅拷贝" class="headerlink" title="深拷贝还是浅拷贝"></a>深拷贝还是浅拷贝</h1><p>深拷贝和浅拷贝的问题，我在第一次参加秋招面试的时候就碰上了，我当时的回答现在已经记不得了，面试之后我看了几个版本的深、浅拷贝代码，觉得不是很难。后来多看了几回自称完美的方案之后，反倒是觉得没有完美的深拷贝方案。</p>
-<h3 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h3><p>（浅拷贝非常简单，第一层属性值如果是引用类型，只拷贝引用）</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">shallowClone</span>(<span class="params">o</span>)</span>&#123;</span><br><span class="line">	<span class="keyword">if</span>( (<span class="keyword">typeof</span> o !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> o !== <span class="string">'function'</span>) || o === <span class="literal">null</span>)</span><br><span class="line">		<span class="keyword">return</span> o;</span><br><span class="line">	<span class="keyword">let</span> obj;</span><br><span class="line">	<span class="keyword">if</span>(o <span class="keyword">instanceof</span> <span class="built_in">Array</span>)</span><br><span class="line">		obj = [];</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		obj = &#123;&#125;;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">let</span> i <span class="keyword">in</span> o)</span><br><span class="line">		obj[i] = o[i];</span><br><span class="line">	<span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>有几个骚操作，在参考【1】中看到的，</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">obj2 = <span class="built_in">Object</span>.assign(&#123;&#125;, obj1)</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;...obj2&#125; &#x3D; obj1</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;仅限数组</span><br><span class="line">arr2 &#x3D; arr1.slice(0);</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;同仅限数组</span><br><span class="line">arr2 &#x3D; [].concat(arr1);</span><br></pre></td></tr></table></figure>
-
-
-
-<blockquote>
-<p>实际上对于数组来说， 只要不修改原数组， 重新返回一个新数组就可以实现浅拷贝，比如说map、filter、reduce等方法</p>
-<p>摘自参考【1】</p>
-</blockquote>
-<h3 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h3><blockquote>
-<p>一般来说 JS 深克隆要考虑下面几个问题：</p>
-<p>JSON 克隆不支持函数、引用、undefined、Date、RegExp 等<br>递归克隆要考虑环、爆栈<br>要考虑 Date、RegExp、Function 等特殊对象的克隆方式<br>要不要克隆 <strong>proto</strong>，如果要克隆，就非常浪费内存；如果不克隆，就不是深克隆。</p>
-<p>摘自参考【2】</p>
-</blockquote>
-<p>因为上述问题的存在，尤其是proto的问题，导致真正意义上的深拷贝很难，递归克隆、Date、RegExp、Function、Error都还有解决的办法，虽然Function的办法依然不完美，使用bind方法（参考【3】）得到的函数本质上还是用了拷贝引用</p>
-<h5 id="暴力不负责实现"><a href="#暴力不负责实现" class="headerlink" title="暴力不负责实现"></a>暴力不负责实现</h5><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="built_in">JSON</span>.parse( <span class="built_in">JSON</span>.stringify(obj))</span><br></pre></td></tr></table></figure>
-
-<p>缺点（摘自参考【1】）：</p>
-<ol>
-<li>会忽略 undefined</li>
-<li>会忽略 symbol</li>
-<li>不能序列化函数</li>
-<li>不能解决循环引用的对象</li>
-<li>不能正确处理new Date()</li>
-<li>不能处理正则</li>
-<li>不能处理new Error()</li>
-<li>会抛弃对象的constructor,所有的构造函数会指向Object【参考4】</li>
-</ol>
-<h5 id="较为完善解法"><a href="#较为完善解法" class="headerlink" title="较为完善解法"></a>较为完善解法</h5><p>先上代码（代码主要来自参考【1】，懒，只添加了函数判断、cache.filter换成的find方法）</p>
-<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepCopy</span>(<span class="params">obj, cache = []</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (obj === <span class="literal">null</span> || (<span class="keyword">typeof</span> obj !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> obj !== <span class="string">'function'</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Date]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object RegExp]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">RegExp</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Error]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Error</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> obj === <span class="string">'function'</span>) <span class="keyword">return</span> obj.bind(&#123;&#125;);</span><br><span class="line">  <span class="keyword">const</span> item = cache.find(<span class="function"><span class="params">item</span> =&gt;</span> item.original === obj)</span><br><span class="line">  <span class="keyword">if</span> (item) <span class="keyword">return</span> item.copy</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> copy = <span class="built_in">Array</span>.isArray(obj) ? [] : &#123;&#125;</span><br><span class="line">  cache.push(&#123;</span><br><span class="line">    original: obj,</span><br><span class="line">    copy</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Object</span>.keys(obj).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    copy[key] = deepCopy(obj[key], cache)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> copy</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>首先，如果变量是基本数据类型，直接返回原值</p>
-<p>如果是特殊对象，Date、RegExp、Error，则通过原值新建变量，如果是Function，通过bind方式可以得到一个新函数，并且这里有一个矛盾</p>
-<p>如果把函数真正意义上拷贝了下来，对比闭包中的函数怎么解决变量引用的问题？我目前没有了解到js中提供闭包内函数对父级函数的引用</p>
-<p>由于bind本质上是在对象上添加了函数的索引，然后再通过对象调用函数的方法实现了修改this指针，因此还是是使用了函数引用，因此闭包可以正常访问</p>
-<p>对于递归引用的问题，使用了数组记录所有拷贝过的对象，如果有重复引用，就直接返回拷贝过的值。除了数组，还可以用Map记录</p>
-<p>缺点：</p>
-<ol>
-<li>依然没有拷贝proto</li>
-<li>Function拷贝不完美</li>
-</ol>
-<p>如果有更好的办法，还会继续更新</p>
-<p>挖个坑，有时间学习</p>
-<p><a href="https://juejin.im/post/5df7175fe51d45582512962c" target="_blank" rel="noopener">头条面试官：你知道如何实现高性能版本的深拷贝嘛？</a></p>
-<p>参考：</p>
-<p>【1】<a href="https://juejin.im/post/5e906ab8518825738e217414" target="_blank" rel="noopener">JavaScript系列： 一、手撕JS中的深浅拷贝</a></p>
-<p>【2】<a href="https://www.zhihu.com/question/64703741/answer/223375284" target="_blank" rel="noopener">JavaScript深克隆-方应杭-知乎回答</a></p>
-<p>【3】<a href="https://stackoverflow.com/questions/1833588/javascript-clone-a-function" target="_blank" rel="noopener">bind方法拷贝函数</a></p>
-<p>【4】<a href="https://juejin.im/post/5abb55ee6fb9a028e33b7e0a" target="_blank" rel="noopener">面试官:请你实现一个深克隆</a></p>
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>前端学习的摸索</title>
-    <url>/2020/03/17/%E5%89%8D%E7%AB%AF%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%91%B8%E7%B4%A2/</url>
-    <content><![CDATA[<p>​        从一年前开始学习前端，现在才不多已经要一年了。转眼间现在就已经是研三了，经历过2019年的秋招，现在春招都开始了这么长时间，我却依旧没有offer，真的让人难受啊，想着现在还有毕业论文的事请没有做，感觉时间很紧迫，有点慌，又怕找不到工作，又怕耽误毕业，哎！希望昨天面试的能够拿到offer吧！</p>
-<p>​        希望能找到北京的工作，虽然以后的空闲时间会很少，但是我也不介意，大不了以后就一周玩一会主机游戏就好。</p>
-<p>​        好了，言归正传，回顾一下我之前的前端学习，和以后应该如何学习吧！</p>
-<h2 id="初始学习"><a href="#初始学习" class="headerlink" title="初始学习"></a>初始学习</h2><p>​        刚开始学习，我是看着最基础的HTML、CSS、JAVASCRIPT学的，因为懒，就先直接看了菜鸟教程的教学跟着学习，当时就感觉好简单啊，都只是一些随便记一下就可以用的语法规则，感觉都不需要学习多久。</p>
-<p>​        然而事实证明，我只看到了最肤浅的东西，看了HTML、CSS基础的教学，却连基本布局都不知道，不知道怎么用float、清楚浮动、高度塌陷，别说flex布局、grid布局，连圣杯和双飞燕布局都写不好。JAVASCRIPT也只是会最简单的语法，不会ES6，也不知道深层次的问题。</p>
-<p>​        就是这样的状态，我开始了秋招（现在想想我要是随便加了个前端学习的群，然后问人，应该怎么学就好了啊，可惜现在似乎有点晚了），面试的第一家，前面都很顺利，问了算法为主，最后问setTimeout和promise执行顺序的时候，我之前看过，但是没有弄懂到底怎么回事，于是就崩了，哎！</p>
-<p>​    之后的面试，也是暴露了对很多基础东西的把握不够，计算机网络了解得少，不知道tcp/udp连接、http和https协议，也不知道缓存使用，之前得算法学习也一直看到难的就不想做，觉得差不多了，就去玩主机游戏了，感觉荒废了很多时间。而且我对前端框架的了解也非常少，甚至还想通过微信小程序的前端框架，来学习，其实前端框架也很简单的，如果不看源码，也就是使用api和JavaScript编程。</p>
-<h2 id="最近的学习"><a href="#最近的学习" class="headerlink" title="最近的学习"></a>最近的学习</h2><p>​        经历了秋招的失败，我一方面想学习框架，一方面我想学习前端框架vue，一方面想通过ES6巩固JavaScript。</p>
-<p>​        然而寒假刚开始，我想的是在家好好玩几天（终于有时间再玩黑暗之魂1 重制版了），然后2月6号回学校，还有半个月的时间好好复习，然而没想到新冠肺炎让我3月17号都还呆在家里，不得不在家复习了。</p>
-<h2 id="今后打算"><a href="#今后打算" class="headerlink" title="今后打算"></a>今后打算</h2><p>​        ES6的内容比我想的多很多，还要继续学习，如果可以的话，想看jQuery源码、Vue源码，对于尤雨溪大佬，一个人开始Vue开发，到现在一个小团队开发，成为前端三大框架之一，我只有佩服的份，希望能一天天减小与大佬的差距。</p>
-<p>​        CSS，我还是需要好好巩固一下布局，学习各种动画，SVG、CANVAS也是要学习的。</p>
-<p>​        前端框架先好好学习API，然后看看实现方法，源码就以后再说吧。</p>
-<p>​        目前在看的教材有阮一峰大佬的ES6，你不知道的JavaScript，还有CSS揭秘，然后每天刷刷算法题，看看别人的面经查漏补缺，再抽空准备毕业的事吧。</p>
-<p>​        今年大家过的都不容易啊，虽然我在家啥都没表现出来，其实内心慌的一批，好担心找不到工作，然后还得住在住女朋友那，想想就可怕，回家过是不可能的，毕竟好不容易从南昌跑到北京，怎么可能再回去呢？</p>
-]]></content>
-      <tags>
-        <tag>学习</tag>
-        <tag>前端</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Soulslike_games</title>
-    <url>/2020/02/17/Soulslike_games/</url>
-    <content><![CDATA[<h2 id="最早的接触：血源"><a href="#最早的接触：血源" class="headerlink" title="最早的接触：血源"></a>最早的接触：血源</h2><p>在研一上学期买了PS4 slim之后，就听说了“新人”必玩的三大游戏：黑魂、血源、仁王，黑魂、血源都是游戏公司From Software制作的，入门难度都非常高，售价也都不低，在研一上的考试周，我在淘宝买了二手的血源PS4光盘，想开始我的受苦之旅。</p>
-<p>然而让我没想到的是，这一买，就是一年都没有通关。别说第一个boss教父了，连一个精英怪神职人员野兽都打不过，打了十多个小时，还在第一个区域逛，于是只好作罢，暂时玩一起买的恶灵附身了。</p>
-<h2 id="Steam上再战魂系列：黑魂3"><a href="#Steam上再战魂系列：黑魂3" class="headerlink" title="Steam上再战魂系列：黑魂3"></a>Steam上再战魂系列：黑魂3</h2><p>再玩魂系列游戏，就是买了游戏本机械革命z2之后了，由于囊中羞涩，只买了低配版i5-8300h配gtx1060，现在是2020年2月17日，感觉玩游戏也还可以，我也在2019年3月左右闲鱼出了PS4 slim，同年6月考拉入手了PS4 pro，新游戏用PS4玩也没有什么问题。</p>
-<p>买了机械革命之后，在十月的万圣节促销中看到了黑魂3的折扣，于是就抑制不了冲动再次开始了受苦之旅。</p>
-<p>然而这次虽然一样受苦但是比上回好多了，在新人导师古达那学习了近2个小时之后，终于侥幸过关，来到了传火祭祀场，然而刚到祭祀场却连路都不知道在哪，还被又一新人杀手太刀哥虐了千百回。后面又在高墙受苦好几回，虽然由于宿舍网不好，我通常都是单机玩，于是侥幸躲过了高墙薪王的洗礼，但是面对洛斯里克骑士和冰狗波尔多仍旧是受苦练练。</p>
-<p>后来好不容易打到了不死聚落，第一回想捏余火加血，却被npc入侵，加上小怪的夹击，有一次殒命。好不容易打到了不死聚落的高塔，却由于太过害怕，把摩恩当作小怪砍了一刀，于是又迎来和摩恩的战斗。</p>
-<p>由于打不过大树，我又一次暂停了魂系列游玩，再玩就是寒假放假回家玩了。然后回到学校之后也继续玩了段时间，陆续打了法兰不死队、老恶魔王、结晶老者、教堂boss（忘记名字了）、剑宗沙立万、吞噬申明的艾尔德里奇、巨人王尤姆、舞娘，之后的大盾boss（忘了名字了）、双王子、薪王化身都是线上找好太阳过的，算是逃课了，dlc进去玩了会也被劝退了，难度提高了不少。</p>
-<h2 id="PS4再战血源"><a href="#PS4再战血源" class="headerlink" title="PS4再战血源"></a>PS4再战血源</h2><p>由于通关黑魂3（本体）给我带来的信心，于是我再一次拾起了血源。</p>
-<p>与上次不同，这次虽然依旧受苦，但是我已经能打过很多boss了，甚至打到了dlc，除了科斯孤儿和劳伦斯打不过外，还有本体的boss不想先打，其他boss都打过了，尤其是没用枪反打过了女boss（再一次忘记了名字）。</p>
-<h2 id="只狼"><a href="#只狼" class="headerlink" title="只狼"></a>只狼</h2><p>和之前的魂系列游戏不同，只狼取消了经历条，取而代之是招架条，虽然可以让玩家更莽了，我却是更加受苦了，再多次挑战二次猿失败后开启了开怪逃课之路。</p>
-<h2 id="魂2，魂1"><a href="#魂2，魂1" class="headerlink" title="魂2，魂1"></a>魂2，魂1</h2><p>血源打过之后，信心爆棚，又买了黑魂2，虽然看到网上说魂2更加受苦，堆怪、加上地图更加恶意。然而我还是小瞧了魂2，想着有经验了，应该不怕，听说法师很牛逼之后，甚至第一个上手吧法师职业，结果发现法师法术次数不够用、施术太慢，依旧受苦，后面也就弃了。</p>
-<p>后来发现ns上有黑暗之魂1 重制版，可以掌上受苦，而且听说魂1的法师很强，于是按捺不住自己想玩无双黑魂的心，又买了魂1。好在魂1我是通关了好几回，加上有弹反捏魂，打不过就刷魂呗，反正是arpg游戏，现在有个存档都玩到了3周目了。</p>
-<h2 id="之后的期待"><a href="#之后的期待" class="headerlink" title="之后的期待"></a>之后的期待</h2><p>19年6月的游戏展上，Form Software公司宣布了新游戏Eleden Ring，期待早日开售。<br>没想到19年12月的新冠肺炎影响到了2020年的游戏展、奥运会、NBA，全球几十亿人，哎，好在游戏还是可以在网上看发布会。</p>
-]]></content>
-      <tags>
-        <tag>主机游戏</tag>
-        <tag>受苦游戏</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>重拾博客</title>
-    <url>/2020/02/16/hello-world/</url>
-    <content><![CDATA[<p>最初在搬瓦工那写了个博客，前后用过两个域名，brota.life和brota.world，之所以换域名是因为连续用两年域名就涨价了很多，满满的都是套路啊，好在我是自个用，换了也没事，两年算下来也就是二十块钱不到。</p>
-<p>搬瓦工在最初用的时候没啥问题，但是后来就不是很稳定。2019的下半年有段时间连不上，再连发现博客被入侵了，不知道怎么解决，索性就把vps格式化了，便想换个稳定点的地方写博客，于是就看中了github，还可以顺便练习下git代码管理。</p>
-<p>具体操作步骤：</p>
-<ol>
-<li>一个github账号</li>
-<li>使用github 的github pages，船家女页面</li>
-<li>使用hexo-cli管理页面</li>
-</ol>
-<p>Github pages的网站地址是https://+项目地址，<a href="[我的博客](https://brotaone.github.io/)">我的博客</a></p>
-<h2 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h2><h3 id="创建博客"><a href="#创建博客" class="headerlink" title="创建博客"></a>创建博客</h3><p>申请github账号，并新建repository，并在设置中使用gitbug pages</p>
-<p>安装git，并设置参数</p>
-<p>设置user.name和user.email配置信息：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git config --global user.name <span class="string">"你的GitHub用户名"</span></span><br><span class="line">git config --global user.email <span class="string">"你的GitHub注册邮箱"</span></span><br></pre></td></tr></table></figure>
-
-<p>生成ssh密钥文件，并导入到github账户中：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;你的GitHub注册邮箱&quot;</span><br></pre></td></tr></table></figure>
-
-<p>安装nodejs，并使用npm安装hexo-cli</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ npm install -g hexo-cli</span><br></pre></td></tr></table></figure>
-
-<h3 id="初始化博客"><a href="#初始化博客" class="headerlink" title="初始化博客"></a>初始化博客</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo init blog</span><br></pre></td></tr></table></figure>
-
-<h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>](<a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">https://hexo.io/docs/server.html</a>)</p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-<h3 id="部署网站"><a href="#部署网站" class="headerlink" title="部署网站"></a>部署网站</h3><p>将Hexo与GitHub关联起来，打开站点的配置文件_config.yml，翻到最后修改为：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">deploy:</span><br><span class="line">	type: git</span><br><span class="line">	repo: 这里填入你之前在GitHub上创建仓库的完整路径，记得加上 .git</span><br><span class="line">	branch: master</span><br></pre></td></tr></table></figure>
-
-<p>安装Git部署插件，输入命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
-
-
-
-<p>这时，我们分别输入三条命令：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hexo clean </span><br><span class="line">hexo g </span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="命令缩写"><a href="#命令缩写" class="headerlink" title="命令缩写"></a>命令缩写</h3><ul>
-<li>hexo n “我的博客” == hexo new “我的博客” #新建文章</li>
-<li>hexo g == hexo generate #生成</li>
-<li>hexo s == hexo server #启动服务预览</li>
-<li>hexo d == hexo deploy #部署</li>
-<li></li>
-<li>hexo server #Hexo会监视文件变动并自动更新，无须重启服务器</li>
-<li>hexo server -s #静态模式</li>
-<li>hexo server -p 5000 #更改端口</li>
-<li>hexo server -i 192.168.1.1 #自定义 IP</li>
-<li>hexo clean #清除缓存，若是网页正常情况下可以忽略这条命令</li>
-</ul>
-]]></content>
-      <tags>
-        <tag>学习</tag>
-      </tags>
-  </entry>
+<search> 
+  
+  
+    
+    <entry>
+      <title>油猴脚本简单尝试</title>
+      <link href="/2020/04/22/%E6%B2%B9%E7%8C%B4%E8%84%9A%E6%9C%AC%E7%AE%80%E5%8D%95%E5%B0%9D%E8%AF%95/"/>
+      <url>/2020/04/22/%E6%B2%B9%E7%8C%B4%E8%84%9A%E6%9C%AC%E7%AE%80%E5%8D%95%E5%B0%9D%E8%AF%95/</url>
+      
+        <content type="html"><![CDATA[<p>如果要问我最强的网页浏览器是什么，Android、IOS、MacOS我不知道，但是其他平台（Windows、Linux）必须是Chrome，不仅仅是出色的性能、丰富的插件，单单是一个油猴插件（Greasemonkey，简称 GM，可以简单理解为脚本管理器），就能实现其他浏览器难以完成的功能（当然此处不包括一些换皮浏览器）。</p><p>油猴插件的介绍：</p><blockquote><p>通过给油猴管理器安装各类脚本，可以让大部分 HTML 为主的网页更方便易用，比如：全速下载网盘文件、去广告、悬停显示大图、Flash/HTML5 播放器转换、阅读模式等。有点像给 Chrome 的插件装上插件</p></blockquote><p>油猴插件自带三个商店<a href="https://greasyfork.org/" target="_blank" rel="noopener">GreasyFork</a> 、<a href="https://openuserjs.org/" target="_blank" rel="noopener">OpenUserJS</a>、<a href="https://gist.github.com/search?l=JavaScript&o=desc&q=" target="_blank" rel="noopener"%3D%3DUserScript%3D%3D"&s=updated">Github 和 Gist</a></p><p>我通常会选择<a href="https://greasyfork.org/" target="_blank" rel="noopener">GreasyFork</a>，网页是中文的，而且搜索起来也很方便，从研一开始使用以来，现在长期使用的插件已经有将近十个了，由于去年开始学习前端，发觉油猴脚本的编写也是用的前端技术，于是就萌生了自己写几个油猴插件的想法。</p><h3 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h3><p>在油猴脚本右键可以添加脚本，然后就会使用默认模板，在模板基础上编写脚本</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ==UserScript==</span></span><br><span class="line"><span class="comment">// @name         New Userscript</span></span><br><span class="line"><span class="comment">// @namespace    http://tampermonkey.net/</span></span><br><span class="line"><span class="comment">// @version      0.1</span></span><br><span class="line"><span class="comment">// @description  try to take over the world!</span></span><br><span class="line"><span class="comment">// @author       You</span></span><br><span class="line"><span class="comment">// @match        http://*/*</span></span><br><span class="line"><span class="comment">// @grant        none</span></span><br><span class="line"><span class="comment">// ==/UserScript==</span></span><br><span class="line"></span><br><span class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"><span class="meta">    'use strict'</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Your code here...</span></span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure><p>油猴脚本的API可以在<a href="https://www.tampermonkey.net/documentation.php?ext=dhdg" target="_blank" rel="noopener">官方文档</a>中查看，也可以选择个人编写的文档，<a href="https://juejin.im/post/5dbf92f95188252a9f2fbe2b" target="_blank" rel="noopener">Tampermonkey油猴用户脚本API文档</a>，我只打算写几个我觉得常用的参数</p><p>其中，match是匹配的网站，可以写多个，只要匹配中一个即可，</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">@require https:&#x2F;&#x2F;code.jquery.com&#x2F;jquery-2.1.4.min.js</span><br><span class="line">@resource icon2 &#x2F;images&#x2F;icon.png</span><br><span class="line">&#x2F;&#x2F; @grant unsafeWindow</span><br><span class="line">&#x2F;&#x2F; @grant window.close</span><br></pre></td></tr></table></figure><p>@require<br>表示在运行脚本前需要加载和运行的JavaScript文件。允许设置多个。</p><p>@resource<br>定义一些需要预加载的资源文件，这些资源可以在脚本中通过GM_getResourceURL，GM_getResourceText访问。允许设置多个。</p><p>@run-at<br>设置注入脚本的时间。<br>    @run-at document-start<br>    @run-at document-body<br>    @run-at document-end<br>    @run-at document-idle<br>    @run-at content-menu </p><p>@grant<br>@grant标签用于设置GM_*方法， unsafeWindow对象， window对象方法的白名单。<br>unsafeWindow用于操纵和替换原页面中的js函数或者js 变量值</p><h3 id="小实验"><a href="#小实验" class="headerlink" title="小实验"></a>小实验</h3><h4 id="知乎去侧边栏"><a href="#知乎去侧边栏" class="headerlink" title="知乎去侧边栏"></a>知乎去侧边栏</h4><p>打开知乎首页，可以明显看到除了问题回答的主题内容外，还有一个侧边栏，主要包括有回答问题、写文章、创作者中心，对于只看回答、 不注定创作的使用者来说不是很方便，不如去掉，然后把主题内容的宽度增加，还可以增加有用区域。</p><p>需要拦截的网站有主页，还有看文章和专栏的页面，由于我的正则学得不好，因此只会最简单无脑的方式，匹配如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;www.zhihu.com&#x2F;</span><br><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;www.zhihu.com&#x2F;*</span><br><span class="line">&#x2F;&#x2F; @match        https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;*</span><br></pre></td></tr></table></figure><p>最简单那的方法，就是把侧边栏去除显示，然后扩大主体的宽度。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;主页的主体和侧边</span><br><span class="line">document.querySelector(&#39;.GlobalSideBar&#39;).style.display &#x3D; &#39;none&#39;;</span><br><span class="line">document.querySelector(&#39;.Topstory-mainColumn&#39;).style.width &#x3D; &#39;1000px&#39;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;具体问题的主体和侧边</span><br><span class="line">document.querySelector(&#39;.Question-sideColumn&#39;).style.display &#x3D; &#39;none&#39;;</span><br><span class="line">document.querySelector(&#39;.Question-mainColumn&#39;).style.width &#x3D; &#39;auto&#39;;</span><br></pre></td></tr></table></figure><p>方法很简单粗暴，但是有两个问题</p><p>第一，主页和具体问题网页主题和侧边的类名不一样，因此需要执行的代码不一样，虽然可以在脚本根据网站不同选择执行，但是对于我这样一个问题，显得有些麻烦，但是如果不分网页直接执行，会由于访问不存在对象的属性报错，而无法继续执行，可解决的办法之一是放在try catch代码块中</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">try</span>&#123;     </span><br><span class="line"><span class="built_in">document</span>.querySelector(<span class="string">'.GlobalSideBar'</span>).style.display = <span class="string">'none'</span>;</span><br><span class="line"><span class="built_in">document</span>.querySelector(<span class="string">'.Topstory-mainColumn'</span>).style.width = <span class="string">'1000px'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(e)&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"><span class="built_in">document</span>.querySelector(<span class="string">'.Question-sideColumn'</span>).style.display = <span class="string">'none'</span>;</span><br><span class="line"> <span class="built_in">document</span>.querySelector(<span class="string">'.Question-mainColumn'</span>).style.width = <span class="string">'auto'</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span>(e)&#123;&#125;</span><br></pre></td></tr></table></figure><p>第二，由于网页加载是一个逐步的过程，样式的加入是在html中加入，脚本必须在内容加载完后执行，@run-at要设置在document-end，因此导致网页加载完后还有一个明显的重排现象</p><p>比较好的解决办法是，在head中插入样式，而不是html元素中写入</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> style = <span class="built_in">document</span>.createElement(<span class="string">'style'</span>);</span><br><span class="line">style.innerHTML = <span class="string">`.GlobalSideBar,.Question-sideColumn&#123;</span></span><br><span class="line"><span class="string">display:none;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">.Topstory-mainColumn&#123;</span></span><br><span class="line"><span class="string">width:1000px;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">.Question-mainColumn&#123;</span></span><br><span class="line"><span class="string">width:1000px;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br><span class="line"><span class="built_in">document</span>.head.append(style);</span><br></pre></td></tr></table></figure><p>同样的思路，也可以去除使用Adblock后知乎的拦截提示</p><h4 id="知乎夜间模式"><a href="#知乎夜间模式" class="headerlink" title="知乎夜间模式"></a>知乎夜间模式</h4><p>思路与去除侧边栏类似，也是在head中增加style标签，将背景设置为黑色，位置设置为对比度高的颜色</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> text = <span class="string">`</span></span><br><span class="line"><span class="string">body,.AppHeader,.Card,.ContentItem-actions,.Comments-container,.CommentsV2,.Topbar,.CommentTopbar,</span></span><br><span class="line"><span class="string">.CommentListV2-header-divider,.CommentsV2-footer,.CommentEditorV2--normal,.CommentEditorV2--active,</span></span><br><span class="line"><span class="string">.CommentEditorV2-inputWrap, .CommentEditorV2-inputWrap--active,.RichText, .RichText--editable, .RichText--clearBoth,</span></span><br><span class="line"><span class="string">.QuestionHeader,.QuestionHeader-footer,</span></span><br><span class="line"><span class="string">        .Post-content,.ColumnPageHeader,pre,.Recommendations-Main,.RichContent-actions.is-fixed&#123;</span></span><br><span class="line"><span class="string">background:#000 !important;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">a[rel],a[data-za-detail-view-element_name]&#123;</span></span><br><span class="line"><span class="string">color:#8590a6 !important;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">body,.CommentEditorV2-inputWrap, .CommentEditorV2-inputWrap--active,.QuestionHeader-title&#123;</span></span><br><span class="line"><span class="string">color:#fff !important;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">        #changeDark:hover&#123;</span></span><br><span class="line"><span class="string">            background: #2e2e2e !important;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br></pre></td></tr></table></figure><p>这里我模仿了<a href="https://greasyfork.org/zh-CN/scripts/28497-remove-web-limits-modified" target="_blank" rel="noopener">网页限制解除(改)</a>，在网页上增加了一个夜间模式开关，通过插入一个div，在div中有有一个复选框表示师傅开启夜间模式，绑定点击事件，修改style中的内容，来决定是否开启，并且使用localSotrage记忆夜间模式开关。</p><p>但是，还有一个问题没有解决，就是知乎的搜索框，当鼠标点击搜索之后，会出现新的白色框，但是当我想查看白色框的类名时，搜索框失焦，于是白色框就消失了，我通过chrome的开发者工具实验，发现应该不是纯css样式，是js+css实现的，于是我就拿不到类名修改背景了，导致连白色背景、白色字，连字都看不清</p><p>。。。等日后更新这个bug吧</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+            <tag> Chrome </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>parcel简单使用</title>
+      <link href="/2020/04/17/parcel%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/"/>
+      <url>/2020/04/17/parcel%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</url>
+      
+        <content type="html"><![CDATA[<p>parcel是我在看方应航方老师的视频<a href="https://www.bilibili.com/video/BV1kE411N7wK/?p=7" target="_blank" rel="noopener">HTML/CSS/JS写自己的简历</a>，中使用的web应用打包工具，同时在<a href="https://www.bilibili.com/video/BV1kE411N7wK/?p=7" target="_blank" rel="noopener">他的GitHub</a>中也有简历模板</p><p><a href="https://parceljs.bootcss.com/" target="_blank" rel="noopener">parcel官网</a>的定位是”极速零配置Web应用打包工具“，特点是：极速打包、零配置代码拆分、热模块替换，相比Webpack上手难度低</p><p>安装方法</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//全局安装</span><br><span class="line">npm install -g parcel-bundler</span><br><span class="line">//安装到项目</span><br><span class="line">npm install -S parcel-bundler</span><br></pre></td></tr></table></figure><p>开启服务器</p><p>对于一个仅包含html、js的网站</p><p>index.html</p><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"./index.js"</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure><p>index.js</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">console</span>.log(<span class="string">'hello world'</span>)</span><br></pre></td></tr></table></figure><p>开启服务器，默认支持热模块替换</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//仅安装在项目中，需加上npx，或运行package.json中的scripts</span><br><span class="line">parcel index.html</span><br></pre></td></tr></table></figure><p>修改端口</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-p &lt;port number&gt;</span><br></pre></td></tr></table></figure><p>也可以使用自动重新构建，但不会开启服务器</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">parcel watch index.html</span><br></pre></td></tr></table></figure><p>脚本任务</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;scripts&quot;: &#123;</span><br><span class="line">    &quot;dev&quot;: &quot;parcel &lt;your entry file&gt;&quot;,</span><br><span class="line">    &quot;build&quot;: &quot;parcel build &lt;your entry file&gt;&quot;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>移动端适配</title>
+      <link href="/2020/04/16/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E9%80%82%E9%85%8D/"/>
+      <url>/2020/04/16/%E7%A7%BB%E5%8A%A8%E7%AB%AF%E9%80%82%E9%85%8D/</url>
+      
+        <content type="html"><![CDATA[<p>由于现在上网设备已不局限于PC，手机、平板，甚至手表也可以浏览网页，然而这些设备的屏幕尺寸差异很大，如果按照以前的PC布局，那么网页要么太小要么需要来回拖动，可视内容非常小，于是就诞生了移动端适配问题。</p><p>移动端适配问题包括有：</p><ul><li><code>1px</code>问题</li><li><code>UI</code>图完美适配方案</li><li><code>iPhoneX</code>适配方案</li><li>横屏适配</li><li>高清屏图片模糊问题</li><li>…</li></ul><p>参考文献：</p><p><a href="https://juejin.im/post/5cddf289f265da038f77696c" target="_blank" rel="noopener">关于移动端适配，你必须要知道的</a></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>electron写一个记事本app</title>
+      <link href="/2020/04/12/electron%E5%86%99%E4%B8%80%E4%B8%AA%E8%AE%B0%E4%BA%8B%E6%9C%ACapp/"/>
+      <url>/2020/04/12/electron%E5%86%99%E4%B8%80%E4%B8%AA%E8%AE%B0%E4%BA%8B%E6%9C%ACapp/</url>
+      
+        <content type="html"><![CDATA[<p>写在前面：</p><p>我是在学习Electron的时候，看到了<a href="https://www.jianshu.com/p/57d910008612" target="_blank" rel="noopener">Electron: 从零开始写一个记事本app</a>，然后就想模仿这篇文章，熟悉一下Electron，在实现的过程中，感觉这个记事本app可以写得更好，于是做了改进。对原文感兴趣的，可以直接点进去看。</p><blockquote><p>Electron是GitHub开发的一个开源框架。它允许使用Node.js（作为后端）和Chromium（作为前端）完成桌面GUI应用程序的开发。Electron现已被多个开源Web应用程序用于前端与后端的开发，著名项目包括GitHub的Atom和微软的Visual Studio Code。</p></blockquote><p>因为使用了Chromium作为前端，因此制作后的软件即使很简单，也会特别小，但也因为Chromium跨平台，因此Electron也可以跨平台开发。</p><h3 id="主要功能"><a href="#主要功能" class="headerlink" title="主要功能"></a>主要功能</h3><p>和原文的记事本app相同</p><p><strong>主菜单：</strong>包括<code>File</code>, <code>Edit</code>, <code>View</code>, <code>Help</code>四个主菜单。重点是<code>File</code>菜单下的三个子菜单：<code>New</code>（新建文件）、<code>Open</code>（打开文件）、<code>Save</code>（保存文件），这三个菜单需要自定义点击事件，其它的菜单基本使用内建的方法处理，所以没什么难度。</p><p><strong>文本框：</strong>用于文本编辑。这也是这个App上的唯一一个组件，它的宽和高自动平铺满整个窗口大小。当修改了文本框中的文字后，会在App标题栏上最右侧添加一个<code>*</code>号以表示文档尚未保存。</p><p><strong>加载和保存文本：</strong>可以打开本地文本文件，支持<code>.txt</code>, <code>.js</code>, <code>.html</code>, <code>.md</code>等文本文件；可以将文本内容保存为本地文本文件。在<strong>打开</strong>或<strong>新建</strong>文件前，如果当前文档尚未保存，会提示用户先保存文档。</p><p><strong>退出程序：</strong>退出窗口或程序时，会检测当前文档是否需要保存，如果尚未保存，提示用户保存。</p><p><strong>右键菜单：</strong>支持右键菜单，可以通过菜单右键执行一些基本的操作，如：复制、粘贴等。<br> 下面是这个记事本App的演示效果，源码下载点击 <a href="https://github.com/XMandarava/Demo-Electron-Notepad" target="_blank" rel="noopener">这里</a>。</p><h3 id="安装electron-forge"><a href="#安装electron-forge" class="headerlink" title="安装electron-forge"></a>安装electron-forge</h3><p>electron-forge是一个类似于傻瓜开发包的Electron工具整合项目</p><p>不得不说，我遇到的第一个难题就是安装electron-forge</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">npm install -g cnpm --registry&#x3D;https:&#x2F;&#x2F;registry.npm.taobao.org</span><br><span class="line">cnpm install -g electron</span><br><span class="line">cnpm install -g electron-forge</span><br></pre></td></tr></table></figure><p>但我在第三步的时候，一直安装模块失败，可是package.json中一直都没有出现安装失败的模块，导致我也无法使用cnpm install手动安装，最后还是靠了科学上网发现，缺少了electron这个模块，我本来以为全局安装之后就不需要了</p><h3 id="对electron的必需了解"><a href="#对electron的必需了解" class="headerlink" title="对electron的必需了解"></a>对electron的必需了解</h3><p><img src="D:%5CDocuments%5Cgit%5Cbrotaone.github.io%5Cblog%5Csource_posts%5Cnotepad1.png" alt="1586676315786"></p><p>上图是我实际代码的结构图，其中index.js、index.html、index.css是自动生成的，是eleectron应用打开直接能看到的部分</p><p>index.html就是打开的第一个窗口，index.js是主进程执行的js文件，只有在index.js中或index.js引用的模块才是在主进程中运行，其他js文件都会是在渲染进程中运行，并且只有渲染进程才能访问document，直接改变视图</p><p>当打开新的窗口时，就可以创建新的渲染进程。如果主进程需要与渲染进程通信，可以使用mainWindow.webContents.send发送信息，ipcRenderer.on接受信息</p><p>对于主菜单和右键菜单， 每一项可选的属性有role、label、type、click、accelerate（快捷键），electron提供的role包括：</p><ul><li>undo： 撤销</li><li>redo：重做</li><li>cut：剪切</li><li>copy：复制</li><li>paste：粘贴</li><li>pasteAndMatchStyle</li><li>selectAll：全选</li><li>delete：删除</li><li>minimize：当前窗口最小化</li><li>close：关闭当前窗口</li><li>quit：退出应用程序</li><li>reload：刷新当前窗口</li><li>forceReload：强制刷新当前窗口，忽略缓存</li><li>toggleDevTools：打开或者关闭 devtool</li><li>togglefullscreen：进行全屏切换</li><li>resetZoom：重置窗口大小</li><li>zoomIn：放大窗口的10%.</li><li>zoomOut：缩小窗口的10%.</li></ul><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;设置分隔符</span><br><span class="line">type: &#39;separator&#39;</span><br><span class="line">&#x2F;&#x2F;设置快捷键</span><br><span class="line">accelerator: &#39;CmdOrCtrl+Z&#39;,</span><br></pre></td></tr></table></figure><h3 id="实现记事本"><a href="#实现记事本" class="headerlink" title="实现记事本"></a>实现记事本</h3><p>记事本的主体页面，可以将一个textarea全屏显示，去掉outline实现</p><p>然后是主菜单，File菜单下需要实现New、Open、Save功能，因此需要能访问textarea，必须得在渲染进程中运行，但是为了能在第一个界面中就渲染出主菜单，又必须在主进程中载入主菜单，因此必须使用主进程向渲染进程通信，将操作交给渲染进程得回调函数执行</p><p>考虑到软件的模块化，我将主菜单全部的代码放在了appMenuTemplate（原文File仍在index.js中）</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> appMenuTemplate = [&#123;</span><br><span class="line">  label: <span class="string">'File'</span>,</span><br><span class="line">  submenu: [&#123;</span><br><span class="line">    label: <span class="string">'New'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'new'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Open'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      global.mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'open'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    label: <span class="string">'Save'</span>,</span><br><span class="line">    click() &#123;</span><br><span class="line">      mainWindow.webContents.send(<span class="string">'action'</span>, <span class="string">'save'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    type: <span class="string">'separator'</span></span><br><span class="line">  &#125;, &#123;</span><br><span class="line">    role: <span class="string">'quit'</span></span><br><span class="line">  &#125;]</span><br><span class="line">&#125;];</span><br></pre></td></tr></table></figure><p>然后在index.js中引入模块，为了在模块中访问mainWindow，我将该变量声明在了global全局里</p><p>并且在渲染模块中，newText、 openText等函数也单独写在了utility.js中，减少耦合</p><h3 id="回调的小问题"><a href="#回调的小问题" class="headerlink" title="回调的小问题"></a>回调的小问题</h3><p>可能是由于electron的api更新，对话框函数返回的不再是一个普通对象，而是一个Promise函数。为了得到数据，就要在then方法中插入回调，比如在打开文件函数中</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">function</span> <span class="title">openText</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">await</span> askSaveIfNeed();</span><br><span class="line">  <span class="comment">//files是promise对象</span></span><br><span class="line">  <span class="keyword">const</span> files = remote.dialog.showOpenDialog(remote.getCurrentWindow(), &#123;</span><br><span class="line">    filters: [</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">"Text Files"</span>, <span class="attr">extensions</span>: [<span class="string">'txt'</span>, <span class="string">'js'</span>, <span class="string">'html'</span>, <span class="string">'md'</span>] &#125;,</span><br><span class="line">      &#123; <span class="attr">name</span>: <span class="string">'All Files'</span>, <span class="attr">extensions</span>: [<span class="string">'*'</span>] &#125;</span><br><span class="line">    ],</span><br><span class="line">    properties: [<span class="string">'openFile'</span>]</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  files.then(<span class="function"><span class="keyword">function</span>(<span class="params">data</span>) </span>&#123;</span><br><span class="line">    currentFile = data.filePaths[<span class="number">0</span>];</span><br><span class="line">    <span class="keyword">const</span> txtRead = readText(currentFile);</span><br><span class="line">    txtEditor.value = txtRead;</span><br><span class="line">    <span class="built_in">document</span>.title = <span class="string">"Notepad - "</span> + currentFile;</span><br><span class="line">    isSaved = <span class="literal">true</span>;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>为了能得到文件的路径和文件名，必须在回调函数中设置</p><h3 id="调用的先后问题"><a href="#调用的先后问题" class="headerlink" title="调用的先后问题"></a>调用的先后问题</h3><p>在原文的基础上，改写之后，似乎就差不多，但是进一步测试发现，如果文件未保存的情况下，点击退出即使选择了保存，也会直接退出程序</p><p>这样的情况是由于，electron很多操作都是依赖异步Promise，点击退出后，由于异步操作，导致退出程序先保存对话框运行，任务直接结束运行了，可解决的办法之一是，将删除操作放在回调函数中执行</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="string">'exiting'</span>:</span><br><span class="line"><span class="comment">//返回的是Promise对象</span></span><br><span class="line">      <span class="keyword">const</span> result = askSaveIfNeed();</span><br><span class="line">      result.then(<span class="function"><span class="params">()</span> =&gt;</span> ipcRenderer.sendSync(<span class="string">'reqaction'</span>, <span class="string">'exit'</span>));</span><br><span class="line">      <span class="keyword">break</span>;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+            <tag> Electron </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>js中容易遗忘的知识点（长更）</title>
+      <link href="/2020/04/12/js%E4%B8%AD%E5%AE%B9%E6%98%93%E9%81%97%E5%BF%98%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9%EF%BC%88%E9%95%BF%E6%9B%B4%EF%BC%89/"/>
+      <url>/2020/04/12/js%E4%B8%AD%E5%AE%B9%E6%98%93%E9%81%97%E5%BF%98%E7%9A%84%E7%9F%A5%E8%AF%86%E7%82%B9%EF%BC%88%E9%95%BF%E6%9B%B4%EF%BC%89/</url>
+      
+        <content type="html"><![CDATA[<p>记录一下我在js学习中，屡看屡忘的知识点，准备长期更新</p><h5 id="遍历方法"><a href="#遍历方法" class="headerlink" title="遍历方法"></a>遍历方法</h5><table><thead><tr><th align="center">方法</th><th align="left">适用范围</th><th>描述</th></tr></thead><tbody><tr><td align="center">for..in</td><td align="left">数组，对象</td><td>获取可枚举的实例和原型属性名</td></tr><tr><td align="center">Object.keys()</td><td align="left">数组，对象</td><td>返回可枚举的实例属性名组成的数组</td></tr><tr><td align="center">Object.getPropertyNames()</td><td align="left">数组，对象</td><td>返回除原型属性以外的所有属性（包括不可枚举的属性）名组成的数组</td></tr><tr><td align="center">for..of</td><td align="left">可迭代对象(Array, Map, Set, arguments等)</td><td>返回属性值</td></tr></tbody></table>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+            <tag> js </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>面试手写函数1</title>
+      <link href="/2020/04/11/%E9%9D%A2%E8%AF%95%E6%89%8B%E5%86%99%E5%87%BD%E6%95%B01/"/>
+      <url>/2020/04/11/%E9%9D%A2%E8%AF%95%E6%89%8B%E5%86%99%E5%87%BD%E6%95%B01/</url>
+      
+        <content type="html"><![CDATA[<p>记录一下最近一段时间，参与春招面试碰到的手写函数，巩固一下自己的基础。</p><h3 id="数组去重"><a href="#数组去重" class="headerlink" title="数组去重"></a>数组去重</h3><p>数组去重本来是很容易的，特别是有了Set对象后(arr为要去重的数组)</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[...new <span class="built_in">Set</span>(arr)]</span><br></pre></td></tr></table></figure><p>但是如果加上附加条件、要求性能就挺麻烦了。</p><p>es5大多数解法是通过一个Map记录数组的每一项，然后便利数组，没有重复的就记录下来，只需要一次遍历。</p><p>如果要求在原数组中操作呢？那么删除元素就只有通过splice方法，但是如果对于数组中有1万个0或者[1,1,2,2,3,3,4,4…]，这种数组，一个个删除的效率太低，可以通过冒泡的方法把非重复项移到数组前面，然后截尾即可。</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span>;    </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> j=<span class="number">0</span>; j &lt; arr.length; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!map.has(arr[j])) &#123;</span><br><span class="line">        i != j &amp;&amp; ([arr[i], arr[j]] = [arr[j], arr[i]]);</span><br><span class="line">        map.set(arr[i++], <span class="literal">true</span>);</span><br><span class="line">      &#125;    </span><br><span class="line">  &#125;</span><br><span class="line">  arr.splice(i, arr.length - i)</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p>那如果数组中的每一项都是对象呢？比如：</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> singers = [</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'Leslie Cheung'</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">1</span>, <span class="attr">name</span>: <span class="string">'Leslie Cheung'</span> &#125;,</span><br><span class="line">    &#123; <span class="attr">id</span>: <span class="number">2</span>, <span class="attr">name</span>: <span class="string">'Eason Chan'</span> &#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure><p>一样也是有骚操作的</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr, key</span>) =&gt;</span> &#123;</span><br><span class="line"><span class="keyword">return</span> [...new <span class="built_in">Map</span>(arr.map(<span class="function"><span class="params">item</span>=&gt;</span>[item[key],item])).values()]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>一样有不依靠骚操作版本</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">uniqBy = <span class="function">(<span class="params">arr, key</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> map = <span class="keyword">new</span> <span class="built_in">Map</span>();</span><br><span class="line">  <span class="keyword">let</span> i = <span class="number">0</span>;    </span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">let</span> j=<span class="number">0</span>; j &lt; arr.length; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (!map.has(arr[j][key])) &#123;</span><br><span class="line">        i != j &amp;&amp; ([arr[i], arr[j]] = [arr[j], arr[i]]);</span><br><span class="line">        map.set(arr[i][key], i++);</span><br><span class="line">      &#125;    </span><br><span class="line">  &#125;</span><br><span class="line">  arr.splice(i, arr.length - i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>js深拷贝</title>
+      <link href="/2020/04/10/js%E6%B7%B1%E6%8B%B7%E8%B4%9D/"/>
+      <url>/2020/04/10/js%E6%B7%B1%E6%8B%B7%E8%B4%9D/</url>
+      
+        <content type="html"><![CDATA[<h1 id="深拷贝还是浅拷贝"><a href="#深拷贝还是浅拷贝" class="headerlink" title="深拷贝还是浅拷贝"></a>深拷贝还是浅拷贝</h1><p>深拷贝和浅拷贝的问题，我在第一次参加秋招面试的时候就碰上了，我当时的回答现在已经记不得了，面试之后我看了几个版本的深、浅拷贝代码，觉得不是很难。后来多看了几回自称完美的方案之后，反倒是觉得没有完美的深拷贝方案。</p><h3 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h3><p>（浅拷贝非常简单，第一层属性值如果是引用类型，只拷贝引用）</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">shallowClone</span>(<span class="params">o</span>)</span>&#123;</span><br><span class="line"><span class="keyword">if</span>( (<span class="keyword">typeof</span> o !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> o !== <span class="string">'function'</span>) || o === <span class="literal">null</span>)</span><br><span class="line"><span class="keyword">return</span> o;</span><br><span class="line"><span class="keyword">let</span> obj;</span><br><span class="line"><span class="keyword">if</span>(o <span class="keyword">instanceof</span> <span class="built_in">Array</span>)</span><br><span class="line">obj = [];</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">obj = &#123;&#125;;</span><br><span class="line"><span class="keyword">for</span>(<span class="keyword">let</span> i <span class="keyword">in</span> o)</span><br><span class="line">obj[i] = o[i];</span><br><span class="line"><span class="keyword">return</span> obj;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>有几个骚操作，在参考【1】中看到的，</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">obj2 = <span class="built_in">Object</span>.assign(&#123;&#125;, obj1)</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;...obj2&#125; &#x3D; obj1</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;仅限数组</span><br><span class="line">arr2 &#x3D; arr1.slice(0);</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;同仅限数组</span><br><span class="line">arr2 &#x3D; [].concat(arr1);</span><br></pre></td></tr></table></figure><blockquote><p>实际上对于数组来说， 只要不修改原数组， 重新返回一个新数组就可以实现浅拷贝，比如说map、filter、reduce等方法</p><p>摘自参考【1】</p></blockquote><h3 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h3><blockquote><p>一般来说 JS 深克隆要考虑下面几个问题：</p><p>JSON 克隆不支持函数、引用、undefined、Date、RegExp 等<br>递归克隆要考虑环、爆栈<br>要考虑 Date、RegExp、Function 等特殊对象的克隆方式<br>要不要克隆 <strong>proto</strong>，如果要克隆，就非常浪费内存；如果不克隆，就不是深克隆。</p><p>摘自参考【2】</p></blockquote><p>因为上述问题的存在，尤其是proto的问题，导致真正意义上的深拷贝很难，递归克隆、Date、RegExp、Function、Error都还有解决的办法，虽然Function的办法依然不完美，使用bind方法（参考【3】）得到的函数本质上还是用了拷贝引用</p><h5 id="暴力不负责实现"><a href="#暴力不负责实现" class="headerlink" title="暴力不负责实现"></a>暴力不负责实现</h5><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">JSON</span>.parse( <span class="built_in">JSON</span>.stringify(obj))</span><br></pre></td></tr></table></figure><p>缺点（摘自参考【1】）：</p><ol><li>会忽略 undefined</li><li>会忽略 symbol</li><li>不能序列化函数</li><li>不能解决循环引用的对象</li><li>不能正确处理new Date()</li><li>不能处理正则</li><li>不能处理new Error()</li><li>会抛弃对象的constructor,所有的构造函数会指向Object【参考4】</li></ol><h5 id="较为完善解法"><a href="#较为完善解法" class="headerlink" title="较为完善解法"></a>较为完善解法</h5><p>先上代码（代码主要来自参考【1】，懒，只添加了函数判断、cache.filter换成的find方法）</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepCopy</span>(<span class="params">obj, cache = []</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (obj === <span class="literal">null</span> || (<span class="keyword">typeof</span> obj !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> obj !== <span class="string">'function'</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> obj</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Date]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Date</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object RegExp]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">RegExp</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Object</span>.prototype.toString.call(obj) === <span class="string">'[object Error]'</span>) <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Error</span>(obj)</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">typeof</span> obj === <span class="string">'function'</span>) <span class="keyword">return</span> obj.bind(&#123;&#125;);</span><br><span class="line">  <span class="keyword">const</span> item = cache.find(<span class="function"><span class="params">item</span> =&gt;</span> item.original === obj)</span><br><span class="line">  <span class="keyword">if</span> (item) <span class="keyword">return</span> item.copy</span><br><span class="line"></span><br><span class="line">  <span class="keyword">let</span> copy = <span class="built_in">Array</span>.isArray(obj) ? [] : &#123;&#125;</span><br><span class="line">  cache.push(&#123;</span><br><span class="line">    original: obj,</span><br><span class="line">    copy</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Object</span>.keys(obj).forEach(<span class="function"><span class="params">key</span> =&gt;</span> &#123;</span><br><span class="line">    copy[key] = deepCopy(obj[key], cache)</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> copy</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>首先，如果变量是基本数据类型，直接返回原值</p><p>如果是特殊对象，Date、RegExp、Error，则通过原值新建变量，如果是Function，通过bind方式可以得到一个新函数，并且这里有一个矛盾</p><p>如果把函数真正意义上拷贝了下来，对比闭包中的函数怎么解决变量引用的问题？我目前没有了解到js中提供闭包内函数对父级函数的引用</p><p>由于bind本质上是在对象上添加了函数的索引，然后再通过对象调用函数的方法实现了修改this指针，因此还是是使用了函数引用，因此闭包可以正常访问</p><p>对于递归引用的问题，使用了数组记录所有拷贝过的对象，如果有重复引用，就直接返回拷贝过的值。除了数组，还可以用Map记录</p><p>缺点：</p><ol><li>依然没有拷贝proto</li><li>Function拷贝不完美</li></ol><p>如果有更好的办法，还会继续更新</p><p>挖个坑，有时间学习</p><p><a href="https://juejin.im/post/5df7175fe51d45582512962c" target="_blank" rel="noopener">头条面试官：你知道如何实现高性能版本的深拷贝嘛？</a></p><p>参考：</p><p>【1】<a href="https://juejin.im/post/5e906ab8518825738e217414" target="_blank" rel="noopener">JavaScript系列： 一、手撕JS中的深浅拷贝</a></p><p>【2】<a href="https://www.zhihu.com/question/64703741/answer/223375284" target="_blank" rel="noopener">JavaScript深克隆-方应杭-知乎回答</a></p><p>【3】<a href="https://stackoverflow.com/questions/1833588/javascript-clone-a-function" target="_blank" rel="noopener">bind方法拷贝函数</a></p><p>【4】<a href="https://juejin.im/post/5abb55ee6fb9a028e33b7e0a" target="_blank" rel="noopener">面试官:请你实现一个深克隆</a></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>前端学习的摸索</title>
+      <link href="/2020/03/17/%E5%89%8D%E7%AB%AF%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%91%B8%E7%B4%A2/"/>
+      <url>/2020/03/17/%E5%89%8D%E7%AB%AF%E5%AD%A6%E4%B9%A0%E7%9A%84%E6%91%B8%E7%B4%A2/</url>
+      
+        <content type="html"><![CDATA[<p>​        从一年前开始学习前端，现在才不多已经要一年了。转眼间现在就已经是研三了，经历过2019年的秋招，现在春招都开始了这么长时间，我却依旧没有offer，真的让人难受啊，想着现在还有毕业论文的事请没有做，感觉时间很紧迫，有点慌，又怕找不到工作，又怕耽误毕业，哎！希望昨天面试的能够拿到offer吧！</p><p>​        希望能找到北京的工作，虽然以后的空闲时间会很少，但是我也不介意，大不了以后就一周玩一会主机游戏就好。</p><p>​        好了，言归正传，回顾一下我之前的前端学习，和以后应该如何学习吧！</p><h2 id="初始学习"><a href="#初始学习" class="headerlink" title="初始学习"></a>初始学习</h2><p>​        刚开始学习，我是看着最基础的HTML、CSS、JAVASCRIPT学的，因为懒，就先直接看了菜鸟教程的教学跟着学习，当时就感觉好简单啊，都只是一些随便记一下就可以用的语法规则，感觉都不需要学习多久。</p><p>​        然而事实证明，我只看到了最肤浅的东西，看了HTML、CSS基础的教学，却连基本布局都不知道，不知道怎么用float、清楚浮动、高度塌陷，别说flex布局、grid布局，连圣杯和双飞燕布局都写不好。JAVASCRIPT也只是会最简单的语法，不会ES6，也不知道深层次的问题。</p><p>​        就是这样的状态，我开始了秋招（现在想想我要是随便加了个前端学习的群，然后问人，应该怎么学就好了啊，可惜现在似乎有点晚了），面试的第一家，前面都很顺利，问了算法为主，最后问setTimeout和promise执行顺序的时候，我之前看过，但是没有弄懂到底怎么回事，于是就崩了，哎！</p><p>​    之后的面试，也是暴露了对很多基础东西的把握不够，计算机网络了解得少，不知道tcp/udp连接、http和https协议，也不知道缓存使用，之前得算法学习也一直看到难的就不想做，觉得差不多了，就去玩主机游戏了，感觉荒废了很多时间。而且我对前端框架的了解也非常少，甚至还想通过微信小程序的前端框架，来学习，其实前端框架也很简单的，如果不看源码，也就是使用api和JavaScript编程。</p><h2 id="最近的学习"><a href="#最近的学习" class="headerlink" title="最近的学习"></a>最近的学习</h2><p>​        经历了秋招的失败，我一方面想学习框架，一方面我想学习前端框架vue，一方面想通过ES6巩固JavaScript。</p><p>​        然而寒假刚开始，我想的是在家好好玩几天（终于有时间再玩黑暗之魂1 重制版了），然后2月6号回学校，还有半个月的时间好好复习，然而没想到新冠肺炎让我3月17号都还呆在家里，不得不在家复习了。</p><h2 id="今后打算"><a href="#今后打算" class="headerlink" title="今后打算"></a>今后打算</h2><p>​        ES6的内容比我想的多很多，还要继续学习，如果可以的话，想看jQuery源码、Vue源码，对于尤雨溪大佬，一个人开始Vue开发，到现在一个小团队开发，成为前端三大框架之一，我只有佩服的份，希望能一天天减小与大佬的差距。</p><p>​        CSS，我还是需要好好巩固一下布局，学习各种动画，SVG、CANVAS也是要学习的。</p><p>​        前端框架先好好学习API，然后看看实现方法，源码就以后再说吧。</p><p>​        目前在看的教材有阮一峰大佬的ES6，你不知道的JavaScript，还有CSS揭秘，然后每天刷刷算法题，看看别人的面经查漏补缺，再抽空准备毕业的事吧。</p><p>​        今年大家过的都不容易啊，虽然我在家啥都没表现出来，其实内心慌的一批，好担心找不到工作，然后还得住在住女朋友那，想想就可怕，回家过是不可能的，毕竟好不容易从南昌跑到北京，怎么可能再回去呢？</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+            <tag> 前端 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Soulslike_games</title>
+      <link href="/2020/02/17/Soulslike_games/"/>
+      <url>/2020/02/17/Soulslike_games/</url>
+      
+        <content type="html"><![CDATA[<h2 id="最早的接触：血源"><a href="#最早的接触：血源" class="headerlink" title="最早的接触：血源"></a>最早的接触：血源</h2><p>在研一上学期买了PS4 slim之后，就听说了“新人”必玩的三大游戏：黑魂、血源、仁王，黑魂、血源都是游戏公司From Software制作的，入门难度都非常高，售价也都不低，在研一上的考试周，我在淘宝买了二手的血源PS4光盘，想开始我的受苦之旅。</p><p>然而让我没想到的是，这一买，就是一年都没有通关。别说第一个boss教父了，连一个精英怪神职人员野兽都打不过，打了十多个小时，还在第一个区域逛，于是只好作罢，暂时玩一起买的恶灵附身了。</p><h2 id="Steam上再战魂系列：黑魂3"><a href="#Steam上再战魂系列：黑魂3" class="headerlink" title="Steam上再战魂系列：黑魂3"></a>Steam上再战魂系列：黑魂3</h2><p>再玩魂系列游戏，就是买了游戏本机械革命z2之后了，由于囊中羞涩，只买了低配版i5-8300h配gtx1060，现在是2020年2月17日，感觉玩游戏也还可以，我也在2019年3月左右闲鱼出了PS4 slim，同年6月考拉入手了PS4 pro，新游戏用PS4玩也没有什么问题。</p><p>买了机械革命之后，在十月的万圣节促销中看到了黑魂3的折扣，于是就抑制不了冲动再次开始了受苦之旅。</p><p>然而这次虽然一样受苦但是比上回好多了，在新人导师古达那学习了近2个小时之后，终于侥幸过关，来到了传火祭祀场，然而刚到祭祀场却连路都不知道在哪，还被又一新人杀手太刀哥虐了千百回。后面又在高墙受苦好几回，虽然由于宿舍网不好，我通常都是单机玩，于是侥幸躲过了高墙薪王的洗礼，但是面对洛斯里克骑士和冰狗波尔多仍旧是受苦练练。</p><p>后来好不容易打到了不死聚落，第一回想捏余火加血，却被npc入侵，加上小怪的夹击，有一次殒命。好不容易打到了不死聚落的高塔，却由于太过害怕，把摩恩当作小怪砍了一刀，于是又迎来和摩恩的战斗。</p><p>由于打不过大树，我又一次暂停了魂系列游玩，再玩就是寒假放假回家玩了。然后回到学校之后也继续玩了段时间，陆续打了法兰不死队、老恶魔王、结晶老者、教堂boss（忘记名字了）、剑宗沙立万、吞噬申明的艾尔德里奇、巨人王尤姆、舞娘，之后的大盾boss（忘了名字了）、双王子、薪王化身都是线上找好太阳过的，算是逃课了，dlc进去玩了会也被劝退了，难度提高了不少。</p><h2 id="PS4再战血源"><a href="#PS4再战血源" class="headerlink" title="PS4再战血源"></a>PS4再战血源</h2><p>由于通关黑魂3（本体）给我带来的信心，于是我再一次拾起了血源。</p><p>与上次不同，这次虽然依旧受苦，但是我已经能打过很多boss了，甚至打到了dlc，除了科斯孤儿和劳伦斯打不过外，还有本体的boss不想先打，其他boss都打过了，尤其是没用枪反打过了女boss（再一次忘记了名字）。</p><h2 id="只狼"><a href="#只狼" class="headerlink" title="只狼"></a>只狼</h2><p>和之前的魂系列游戏不同，只狼取消了经历条，取而代之是招架条，虽然可以让玩家更莽了，我却是更加受苦了，再多次挑战二次猿失败后开启了开怪逃课之路。</p><h2 id="魂2，魂1"><a href="#魂2，魂1" class="headerlink" title="魂2，魂1"></a>魂2，魂1</h2><p>血源打过之后，信心爆棚，又买了黑魂2，虽然看到网上说魂2更加受苦，堆怪、加上地图更加恶意。然而我还是小瞧了魂2，想着有经验了，应该不怕，听说法师很牛逼之后，甚至第一个上手吧法师职业，结果发现法师法术次数不够用、施术太慢，依旧受苦，后面也就弃了。</p><p>后来发现ns上有黑暗之魂1 重制版，可以掌上受苦，而且听说魂1的法师很强，于是按捺不住自己想玩无双黑魂的心，又买了魂1。好在魂1我是通关了好几回，加上有弹反捏魂，打不过就刷魂呗，反正是arpg游戏，现在有个存档都玩到了3周目了。</p><h2 id="之后的期待"><a href="#之后的期待" class="headerlink" title="之后的期待"></a>之后的期待</h2><p>19年6月的游戏展上，Form Software公司宣布了新游戏Eleden Ring，期待早日开售。<br>没想到19年12月的新冠肺炎影响到了2020年的游戏展、奥运会、NBA，全球几十亿人，哎，好在游戏还是可以在网上看发布会。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 主机游戏 </tag>
+            
+            <tag> 受苦游戏 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>重拾博客</title>
+      <link href="/2020/02/16/hello-world/"/>
+      <url>/2020/02/16/hello-world/</url>
+      
+        <content type="html"><![CDATA[<p>最初在搬瓦工那写了个博客，前后用过两个域名，brota.life和brota.world，之所以换域名是因为连续用两年域名就涨价了很多，满满的都是套路啊，好在我是自个用，换了也没事，两年算下来也就是二十块钱不到。</p><p>搬瓦工在最初用的时候没啥问题，但是后来就不是很稳定。2019的下半年有段时间连不上，再连发现博客被入侵了，不知道怎么解决，索性就把vps格式化了，便想换个稳定点的地方写博客，于是就看中了github，还可以顺便练习下git代码管理。</p><p>具体操作步骤：</p><ol><li>一个github账号</li><li>使用github 的github pages，船家女页面</li><li>使用hexo-cli管理页面</li></ol><p>Github pages的网站地址是https://+项目地址，<a href="[我的博客](https://brotaone.github.io/)">我的博客</a></p><h2 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h2><h3 id="创建博客"><a href="#创建博客" class="headerlink" title="创建博客"></a>创建博客</h3><p>申请github账号，并新建repository，并在设置中使用gitbug pages</p><p>安装git，并设置参数</p><p>设置user.name和user.email配置信息：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">"你的GitHub用户名"</span></span><br><span class="line">git config --global user.email <span class="string">"你的GitHub注册邮箱"</span></span><br></pre></td></tr></table></figure><p>生成ssh密钥文件，并导入到github账户中：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh-keygen -t rsa -C &quot;你的GitHub注册邮箱&quot;</span><br></pre></td></tr></table></figure><p>安装nodejs，并使用npm安装hexo-cli</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g hexo-cli</span><br></pre></td></tr></table></figure><h3 id="初始化博客"><a href="#初始化博客" class="headerlink" title="初始化博客"></a>初始化博客</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init blog</span><br></pre></td></tr></table></figure><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>](<a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">https://hexo.io/docs/server.html</a>)</p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p><h3 id="部署网站"><a href="#部署网站" class="headerlink" title="部署网站"></a>部署网站</h3><p>将Hexo与GitHub关联起来，打开站点的配置文件_config.yml，翻到最后修改为：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">type: git</span><br><span class="line">repo: 这里填入你之前在GitHub上创建仓库的完整路径，记得加上 .git</span><br><span class="line">branch: master</span><br></pre></td></tr></table></figure><p>安装Git部署插件，输入命令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure><p>这时，我们分别输入三条命令：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean </span><br><span class="line">hexo g </span><br><span class="line">hexo d</span><br></pre></td></tr></table></figure><h3 id="命令缩写"><a href="#命令缩写" class="headerlink" title="命令缩写"></a>命令缩写</h3><ul><li>hexo n “我的博客” == hexo new “我的博客” #新建文章</li><li>hexo g == hexo generate #生成</li><li>hexo s == hexo server #启动服务预览</li><li>hexo d == hexo deploy #部署</li><li></li><li>hexo server #Hexo会监视文件变动并自动更新，无须重启服务器</li><li>hexo server -s #静态模式</li><li>hexo server -p 5000 #更改端口</li><li>hexo server -i 192.168.1.1 #自定义 IP</li><li>hexo clean #清除缓存，若是网页正常情况下可以忽略这条命令</li></ul>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 学习 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
 </search>
